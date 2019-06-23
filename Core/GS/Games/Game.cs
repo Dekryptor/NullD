@@ -33,6 +33,10 @@ using NullD.Net.GS.Message.Definitions.Game;
 using NullD.Net.GS.Message.Definitions.Misc;
 using NullD.Net.GS.Message.Definitions.Player;
 using NullD.Net.GS.Message.Fields;
+using NullD.Core.GS.Actors.Implementations.Hirelings;
+using System.Threading.Tasks;
+using NullD.Core.GS.Common.Types.Math;
+using System.Collections.Generic;
 
 namespace NullD.Core.GS.Games
 {
@@ -305,13 +309,188 @@ namespace NullD.Core.GS.Games
                     joinedPlayer.AddLoreFromBase(Convert.ToInt32(part));
             }
             #endregion
+            if (joinedPlayer.PlayerIndex == 0)
+            {
+                if (joinedPlayer.Toon.ActiveAct == 0)
+                {
+                    #region Акт 1 Квест 1
+                    if (joinedPlayer.Toon.ActiveQuest == 87700 & joinedPlayer.Toon.StepIDofQuest > 0)
+                    {
+                        StartingWorld.Leave(StartingWorld.GetActorByDynamicId(72));
+                        //3739 - Rumford
+
+                        var Capitan = StartingWorld.GetActorBySNO(3739);
+                        Capitan.Attributes[Net.GS.Message.GameAttribute.MinimapActive] = true;
+                        (Capitan as Core.GS.Actors.InteractiveNPC).Conversations.Clear();
+                        (Capitan as Core.GS.Actors.InteractiveNPC).Conversations.Add(new Core.GS.Actors.Interactions.ConversationInteraction(198503));
+
+                        Capitan.Attributes[Net.GS.Message.GameAttribute.Conversation_Icon, 0] = 1;
+                        Capitan.Attributes.BroadcastChangedIfRevealed();
+
+                    }
+                    #endregion
+
+                    #region Акт 1 Квест 2 - Наследие декарда каина
+                    else if (joinedPlayer.Toon.ActiveQuest == 72095)
+                    {
+
+                        StartingWorld.Leave(StartingWorld.GetActorByDynamicId(72));
+
+                        #region Перемотка ко второму квесту
+                        for (int Rem = 0; Rem < 8; Rem++)
+                        {
+                            StartingWorld.Game.Quests.Advance(87700);
+                        }
+                        StartingWorld.Game.Quests.NotifyQuest(87700, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.InteractWithActor, 192164);
+                        StartingWorld.Game.Quests.NotifyQuest(87700, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.HadConversation, 198521);
+
+                        #endregion
+
+
+                        //Берем нужную Лию =)
+                        var LeahBrains = StartingWorld.GetActorByDynamicId(83);
+
+                        Player MasterPlayer = joinedPlayer;
+                        if (LeahBrains != null)
+                        {
+                            Logger.Debug("Вышибаем SNO {0}, мир содершит {1} ", LeahBrains.ActorSNO, StartingWorld.GetActorsBySNO(3739).Count);
+                            StartingWorld.Leave(LeahBrains);
+
+
+                        }
+                        if (joinedPlayer.Toon.StepIDofQuest == -1 || joinedPlayer.Toon.StepIDofQuest == 28)
+                        {
+                            try
+                            {
+                                Hireling LeahFriend = new LeahParty(StartingWorld, LeahBrains.ActorSNO.Id, LeahBrains.Tags);
+                                //LeahFriend.Brain = new HirelingBrain(LeahFriend);
+
+                                LeahFriend.GBHandle.Type = 4;
+                                LeahFriend.GBHandle.GBID = 717705071;
+                                LeahFriend.Attributes[GameAttribute.Pet_Creator] = joinedPlayer.PlayerIndex;
+                                LeahFriend.Attributes[GameAttribute.Pet_Type] = 0x8;
+                                LeahFriend.Attributes[GameAttribute.Hitpoints_Max] = 100f;
+                                LeahFriend.Attributes[GameAttribute.Hitpoints_Cur] = 80f;
+                                LeahFriend.Attributes[GameAttribute.Attacks_Per_Second] = 1.6f;
+                                LeahFriend.Attributes[GameAttribute.Pet_Owner] = joinedPlayer.PlayerIndex;
+                                LeahFriend.Attributes[GameAttribute.Untargetable] = false;
+                                LeahFriend.Position = joinedPlayer.Position;
+                                LeahFriend.RotationW = LeahBrains.RotationW;
+                                LeahFriend.RotationAxis = LeahBrains.RotationAxis;
+                                LeahFriend.EnterWorld(LeahBrains.Position);
+                                LeahFriend.Attributes[GameAttribute.Level]++;
+                                joinedPlayer.ActiveHireling = LeahFriend;
+                                LeahFriend.Brain.Activate();
+                                MasterPlayer = joinedPlayer;
+                                StartingWorld.Leave(LeahBrains);
+
+
+                                var NewTristramPortal = StartingWorld.GetActorBySNO(223757);
+                                var ListenerUsePortalTask = Task<bool>.Factory.StartNew(() => OnUseTeleporterListener(NewTristramPortal.DynamicID, StartingWorld));
+                                ListenerUsePortalTask.ContinueWith(delegate //Once killed:
+                                {
+                                    Logger.Debug(" Waypoint_NewTristram Objective done "); // Waypoint_NewTristram
+
+                                });
+                                var ListenerEnterToOldTristram = Task<bool>.Factory.StartNew(() => OnListenerToEnter(joinedPlayer, StartingWorld));
+
+                                ListenerEnterToOldTristram.ContinueWith(delegate //Once killed:
+                                {
+                                    Logger.Debug("Enter to Road Objective done "); // Waypoint_OldTristram
+                                    var ListenerEnterToAdriaEnter = Task<bool>.Factory.StartNew(() => OnListenerToAndriaEnter(joinedPlayer, StartingWorld));
+                                });
+
+                            }
+                            catch
+                            {
+                                Logger.Warn("Ошибка создания спутника");
+
+                                var NewTristramPortal = StartingWorld.GetActorBySNO(223757);
+                                var ListenerUsePortalTask = Task<bool>.Factory.StartNew(() => OnUseTeleporterListener(NewTristramPortal.DynamicID, StartingWorld));
+                                ListenerUsePortalTask.ContinueWith(delegate //Once killed:
+                                {
+                                    Logger.Debug(" Waypoint_NewTristram Objective done "); // Waypoint_NewTristram
+
+                                });
+                                var ListenerEnterToOldTristram = Task<bool>.Factory.StartNew(() => OnListenerToEnter(joinedPlayer, StartingWorld));
+
+                                ListenerEnterToOldTristram.ContinueWith(delegate //Once killed:
+                                {
+                                    Logger.Debug("Enter to Road Objective done "); // Waypoint_OldTristram
+                                    var ListenerEnterToAdriaEnter = Task<bool>.Factory.StartNew(() => OnListenerToAndriaEnter(joinedPlayer, StartingWorld));
+                                });
+                            }
+                        }
+                        else if (joinedPlayer.Toon.StepIDofQuest == 51)
+                        {
+                            joinedPlayer.Toon.StepOfQuest = 6;
+                            var Gate = StartingWorld.GetActorBySNO(108466);
+                            Gate.Destroy();
+                            StartingWorld.Leave(LeahBrains);
+                        }
+                        else
+                        {
+                            StartingWorld.Leave(LeahBrains);
+                            LeahBrains.EnterWorld(LeahBrains.Position);
+                        }
+                    }
+
+                    #endregion
+
+                }
+            }
 
             #region Прохождение игры 2.0 и Хард Фиксы
             if (joinedPlayer.Toon.ActiveQuest != -1)
             {
                 if (joinedPlayer.Toon.ActiveAct == 0)
                 {
-                    joinedPlayer.EnterWorld(this.StartingWorld.StartingPoints.Find(x => x.ActorSNO.Name == "Start_Location_Team_0").Position);
+                    joinedPlayer.EnterWorld(StartingWorld.StartingPoints.First().Position);
+
+                    if (joinedPlayer.Toon.ActiveQuest != 87700)
+                    {
+                        #region Нижнии ворота тристрама
+                        var DownGate = StartingWorld.GetActorBySNO(90419);
+                        DownGate.Attributes[GameAttribute.Gizmo_State] = 1;
+                        DownGate.Attributes[GameAttribute.Untargetable] = true;
+                        DownGate.Attributes.BroadcastChangedIfRevealed();
+                        StartingWorld.BroadcastIfRevealed(new Net.GS.Message.Definitions.Animation.SetIdleAnimationMessage
+                        {
+                            ActorID = DownGate.DynamicID,
+                            AnimationSNO = Core.GS.Common.Types.TagMap.AnimationSetKeys.Open.ID
+                        }, DownGate);
+                        #endregion
+                        //Убираем телегу
+                        var FactorToShoot = StartingWorld.GetActorBySNO(81699);
+                        FactorToShoot.Destroy();
+                    }
+
+                    #region Убираем телегу или делаем её нормальной.
+                    if (joinedPlayer.Toon.ActiveQuest != 87700 && joinedPlayer.Toon.ActiveQuest != 72095 && joinedPlayer.Toon.ActiveQuest != -1)
+                    {
+                        var TELEGAS = StartingWorld.GetActorsBySNO(112131);
+                        foreach (var TELEGA in TELEGAS)
+                            TELEGA.Destroy();
+                    }
+                    else
+                    {
+                        var TELEGAS = StartingWorld.GetActorsBySNO(112131);
+                        foreach (var TELEGA in TELEGAS)
+                            TELEGA.Field2 = 0;
+                    }
+                    #endregion
+
+                    if (joinedPlayer.Toon.StepIDofQuest != -1)
+                        StartingWorld.Game.Quests[joinedPlayer.Toon.ActiveQuest].SwitchToStep(joinedPlayer.Toon.ActiveQuest, joinedPlayer.Toon.StepIDofQuest);
+                    else
+                        StartingWorld.Game.Quests[joinedPlayer.Toon.ActiveQuest].Advance();
+                    if (joinedPlayer.Toon.ActiveQuest == 72546)
+                        if (joinedPlayer.Toon.StepIDofQuest == 36)
+                            joinedPlayer.Toon.StepOfQuest = 10;
+                    if (joinedPlayer.Toon.ActiveQuest == 72061)
+                        if (joinedPlayer.Toon.StepIDofQuest == 44)
+                            StartingWorld.Game.Quests.NotifyQuest(72061, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterWorld, 50585);
+
                 }
             }
             else
@@ -336,6 +515,147 @@ namespace NullD.Core.GS.Games
             joinedPlayer.InGameClient.TickingEnabled = true; // it seems bnet-servers only start ticking after player is completely in-game. /raist
         }
 
+        #region Отслеживания для Акт 1 - Квест 2
+        private bool OnUseTeleporterListener(uint actorDynID, Core.GS.Map.World world)
+        {
+            if (world.HasActor(actorDynID))
+            {
+                var actor = world.GetActorByDynamicId(actorDynID); // it is not null :p
+
+                //Logger.Debug(" supposed portal has type {3} has name {0} and state {1} , has gizmo  been operated ? {2} ", actor.NameSNOId, actor.Attributes[Net.GS.Message.GameAttribute.Gizmo_State], actor.Attributes[Net.GS.Message.GameAttribute.Gizmo_Has_Been_Operated], actor.GetType());
+
+                while (true)
+                {
+                    if (actor.Attributes[Net.GS.Message.GameAttribute.Gizmo_Has_Been_Operated] == true)
+                    {
+                        world.Game.Quests.Advance(72095);
+                        foreach (var playerN in world.Players.Values)
+                        {
+                            playerN.Toon.ActiveQuest = 72095;
+                            //dbQuestProgress.StepIDofQuest = 28;
+                        }
+                        break;
+                    }
+                }
+            }
+            return true;
+        }
+        private bool OnListenerToEnterScene(Core.GS.Players.Player player, Core.GS.Map.World world, int SceneID)
+        {
+            while (true)
+            {
+                try
+                {
+                    int NOWsceneID = player.CurrentScene.SceneSNO.Id;
+                    if (NOWsceneID == SceneID)
+                    {
+
+                        break;
+                    }
+                }
+                catch { Logger.Debug("Приостановка скрипта, идёт загрузка."); }
+            }
+            return true;
+        }
+
+
+        private bool OnListenerToEnter(Core.GS.Players.Player player, Core.GS.Map.World world)
+        {
+            while (true)
+            {
+                try
+                {
+                    int sceneID = player.CurrentScene.SceneSNO.Id;
+                    if (sceneID == 90196)
+                    {
+                        foreach (var playerN in world.Players.Values)
+                        {
+                            playerN.Toon.ActiveQuest = 72095;
+                            playerN.Toon.StepOfQuest = 3;
+                        }
+
+                        try
+                        {
+                            if (player.ActiveHireling != null)
+                            {
+                                Vector3D NearDoor = new Vector3D(1935.697f, 2792.971f, 40.23627f);
+                                var facingAngle = Core.GS.Actors.Movement.MovementHelpers.GetFacingAngle(player.ActiveHireling.Position, NearDoor);
+                                player.ActiveHireling.Brain.DeActivate();
+                                player.ActiveHireling.Move(NearDoor, facingAngle);
+
+                                StartConversation(world, 166678);
+                            }
+                        }
+
+                        catch { }
+                        break;
+                    }
+                }
+                catch { Logger.Debug("Приостановка скрипта, идёт загрузка."); }
+            }
+            return true;
+        }
+
+        private bool OnListenerToAndriaEnter(Core.GS.Players.Player player, Core.GS.Map.World world)
+        {
+            while (true)
+            {
+                try
+                {
+                    if (player.World.WorldSNO.Id == 71150)
+                    {
+                        int sceneID = player.CurrentScene.SceneSNO.Id;
+                        if (sceneID == 90293)
+                        {
+                            foreach (var playerN in world.Players.Values)
+                            {
+                                playerN.Toon.ActiveQuest = 72095;
+                                playerN.Toon.StepOfQuest = 5;
+                            }
+                            world.Game.Quests.NotifyQuest(72095, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterTrigger, -1);
+                            break;
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            return true;
+        }
+        private bool OnKillListenerCain(List<uint> monstersAlive, Core.GS.Map.World world)
+        {
+            Int32 monstersKilled = 0;
+            var monsterCount = monstersAlive.Count; //Since we are removing values while iterating, this is set at the first real read of the mob counting.
+            while (monstersKilled != monsterCount)
+            {
+                //Iterate through monstersAlive List, if found dead we start to remove em till all of em are dead and removed.
+                for (int i = monstersAlive.Count - 1; i >= 0; i--)
+                {
+                    if (world.HasMonster(monstersAlive[i]))
+                    {
+                        //Alive: Nothing.
+                    }
+                    else
+                    {
+                        //If dead we remove it from the list and keep iterating.
+                        Logger.Debug(monstersAlive[i] + " has been killed");
+                        monstersAlive.RemoveAt(i);
+                        monstersKilled++;
+                    }
+                }
+            }
+            return true;
+        }
+        #endregion
+
+        private bool StartConversation(Core.GS.Map.World world, Int32 conversationId)
+        {
+            foreach (var player in world.Players)
+            {
+                player.Value.Conversations.StartConversation(conversationId);
+            }
+            return true;
+        }
         /// <summary>
         /// Sends NewPlayerMessage to players when a new player joins the game. 
         /// </summary>

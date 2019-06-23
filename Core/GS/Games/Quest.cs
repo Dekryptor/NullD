@@ -406,7 +406,40 @@ namespace NullD.Core.GS.Games
             }
             return true;
         }
+        public void SwitchToStep(int SnoQuest, int SelectedStep)
+        {
+            int NeededStep = 0;
+            CurrentStep.CompleteObjectiveSet(0);
+            for (int i = 0; i < this.asset.QuestSteps.Count; i++)
+            {
+                if (this.asset.QuestSteps[i].ID == SelectedStep)
+                {
+                    NeededStep = i;
+                }
 
+            }
+            if (SnoQuest == 72221)
+            {
+                if (SelectedStep == 35)
+                { NeededStep -= 1; }
+            }
+            else if (SnoQuest == 80322)
+            {
+                if (SelectedStep == 106)
+                { NeededStep -= 1; }
+            }
+            else if (SnoQuest == 72546)
+            {
+                if (SelectedStep == 36)
+                { NeededStep -= 1; }
+            }
+            for (int i = 0; i < NeededStep; i++)
+            {
+                CurrentStep.CompleteObjectiveSet(0);
+            }
+
+            //CurrentStep.CompleteObjectiveSet(0);
+        }
         public void Advance()
         {
             ////Logger.Debug(" Advancing Current step  {0}", CurrentStep.QuestStepID);

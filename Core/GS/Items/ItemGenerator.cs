@@ -682,31 +682,32 @@ namespace NullD.Core.GS.Items
         }
 
         // Creates an item based on supplied definition.
-        public static Item CreateItem(NullD.Core.GS.Actors.Actor owner, ItemTable definition)
+        public static Item CreateItem(NullD.Core.GS.Actors.Actor owner, ItemTable definition, bool Craft = false)
         {
             // Logger.Trace("Creating item: {0} [sno:{1}, gbid {2}]", definition.Name, definition.SNOActor, StringHashHelper.HashItemName(definition.Name));
 
             Type type = GetItemClass(definition);
 
-            var item = (Item)Activator.CreateInstance(type, new object[] { owner.World, definition });
+            var item = (Item)Activator.CreateInstance(type, new object[] { owner.World, definition, Craft });
 
             return item;
         }
 
         // Allows cooking a custom item.
-        public static Item Cook(Player player, string name)
+        public static Item Cook(Player player, string name, bool Craft = false)
         {
             int hash = StringHashHelper.HashItemName(name);
             ItemTable definition = Items[hash];
-            return CookFromDefinition(player, definition);
+
+            return CookFromDefinition(player, definition, Craft);
         }
 
         // Allows cooking a custom item.
-        public static Item CookFromDefinition(Player player, ItemTable definition)
+        public static Item CookFromDefinition(Player player, ItemTable definition, bool Craft = false)
         {
             Type type = GetItemClass(definition);
 
-            var item = (Item)Activator.CreateInstance(type, new object[] { player.World, definition });
+            var item = (Item)Activator.CreateInstance(type, new object[] { player.World, definition, Craft });
             //player.GroundItems[item.DynamicID] = item;
 
             return item;
