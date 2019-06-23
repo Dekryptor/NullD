@@ -104,6 +104,54 @@ namespace NullD.Core.GS.Powers
 
             // find and run a power implementation
             var implementation = PowerLoader.CreateImplementationForPowerSNO(powerSNO);
+            if (target != null)
+            {
+                try
+                {
+                    #region Выход через шкаф)
+
+                    if (target.ActorSNO.Id == 188743)
+                    {
+                        foreach (var player in user.World.Game.Players.Values)
+                        {
+                            if (player.PlayerIndex == 0 & player.Toon.ActiveQuest == 72095)
+                            {
+                                player.Toon.ActiveQuest = 72095;
+                                if (player.Toon.StepOfQuest == 14)
+                                {
+                                    player.Toon.StepOfQuest = 15;
+                                    player.Toon.StepIDofQuest = 32;
+                                    user.World.Game.Quests.Advance(72095);
+                                }
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    #region Двери собора
+
+                    else if (target.DynamicID == 1543 || target.ActorSNO.Id == 167289)
+                    {
+                        foreach (var player in user.World.Game.Players.Values)
+                        {
+                            if (player.PlayerIndex == 0 & player.Toon.ActiveQuest == 72095)
+                            {
+                                player.Toon.ActiveQuest = 72095;
+                                if (player.Toon.StepOfQuest == 9)
+                                {
+                                    player.Toon.StepOfQuest = 10;
+                                    player.Toon.StepIDofQuest = 23;
+                                    user.World.Game.Quests.Advance(72095);
+                                }
+                            }
+                        }
+                    }
+
+                    #endregion
+                }
+                catch { }
+            }
             if (implementation != null)
             {
                 return RunPower(user, implementation, target, targetPosition, targetMessage);
