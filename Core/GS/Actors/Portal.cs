@@ -239,57 +239,8 @@ namespace NullD.Core.GS.Actors
             }
             catch (KeyNotFoundException)
             {
-                #region Спуск на второй уровень в подземелье на кладбище
-                if (world.WorldSNO.Id == 154587 && world.GetActorsBySNO(176002) != null)
-                {
-                    var Portal = world.GetActorBySNO(176002);
-                    if (Portal != null)
-                    {
-                        this.Destination = new ResolvedPortalDestination
-                        {
-                            WorldSNO = 60600,
-                            DestLevelAreaSNO = 60601,
-                            StartingPointActorTag = 172 //30
-                        };
-                    }
-                    else
-                    {
-                        int ScenetoDest = 0;
-                        int LevelArea = 0;
-                        int World = 0;
-                        foreach (var Gamer in this.World.Game.Players.Values)
-                        {
-                            if (Gamer.PlayerIndex == 0)
-                            {
-                                World = Gamer.World.WorldSNO.Id;
-                                ScenetoDest = Gamer.CurrentScene.SceneSNO.Id;
-                                if (Gamer.CurrentScene.Specification.SNOLevelAreas[1] != -1)
-                                    LevelArea = Gamer.CurrentScene.Specification.SNOLevelAreas[1];
-                                else
-                                    LevelArea = Gamer.CurrentScene.Specification.SNOLevelAreas[0];
-                            }
-                        }
-
-                        this.Destination = new ResolvedPortalDestination
-                        {
-                            WorldSNO = World,
-                            DestLevelAreaSNO = LevelArea,
-                            StartingPointActorTag = ScenetoDest
-                        };
-                    }
-                }
-                else if (world.WorldSNO.Id == 60600)
-                {
-                    this.Destination = new ResolvedPortalDestination
-                    {
-                        WorldSNO = 154587,
-                        DestLevelAreaSNO = 154588,
-                        StartingPointActorTag = 171 //30
-                    };
-                }
-                #endregion
                 #region Портальная система
-                else if (this.ActorSNO.Id == 5648)
+                if (this.ActorSNO.Id == 5648)
                 {
                     //Generate Portal
                     foreach (var player in this.World.Players.Values)
@@ -337,6 +288,56 @@ namespace NullD.Core.GS.Actors
 
                 }
                 #endregion
+                #region Спуск на второй уровень в подземелье на кладбище
+                else if (world.WorldSNO.Id == 154587 && world.GetActorsBySNO(176002) != null)
+                {
+                    var Portal = world.GetActorBySNO(176002);
+                    if (Portal != null)
+                    {
+                        this.Destination = new ResolvedPortalDestination
+                        {
+                            WorldSNO = 60600,
+                            DestLevelAreaSNO = 60601,
+                            StartingPointActorTag = 172 //30
+                        };
+                    }
+                    else
+                    {
+                        int ScenetoDest = 0;
+                        int LevelArea = 0;
+                        int World = 0;
+                        foreach (var Gamer in this.World.Game.Players.Values)
+                        {
+                            if (Gamer.PlayerIndex == 0)
+                            {
+                                World = Gamer.World.WorldSNO.Id;
+                                ScenetoDest = Gamer.CurrentScene.SceneSNO.Id;
+                                if (Gamer.CurrentScene.Specification.SNOLevelAreas[1] != -1)
+                                    LevelArea = Gamer.CurrentScene.Specification.SNOLevelAreas[1];
+                                else
+                                    LevelArea = Gamer.CurrentScene.Specification.SNOLevelAreas[0];
+                            }
+                        }
+
+                        this.Destination = new ResolvedPortalDestination
+                        {
+                            WorldSNO = World,
+                            DestLevelAreaSNO = LevelArea,
+                            StartingPointActorTag = ScenetoDest
+                        };
+                    }
+                }
+                else if (world.WorldSNO.Id == 60600)
+                {
+                    this.Destination = new ResolvedPortalDestination
+                    {
+                        WorldSNO = 154587,
+                        DestLevelAreaSNO = 154588,
+                        StartingPointActorTag = 171 //30
+                    };
+                }
+                #endregion
+               
                 #region Умное вычисление выхода
                 else
                 {

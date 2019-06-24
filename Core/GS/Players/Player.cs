@@ -805,6 +805,7 @@ namespace NullD.Core.GS.Players
             if (message is AssignActiveSkillMessage) OnAssignActiveSkill(client, (AssignActiveSkillMessage)message);
             else if (message is AssignTraitsMessage) OnAssignPassiveSkills(client, (AssignTraitsMessage)message);
             //else if (message is PlayerChangeHotbarButtonMessage) OnPlayerChangeHotbarButtonMessage(client, (PlayerChangeHotbarButtonMessage)message);
+            else if (message is EquipHealthPotion) EquipPotion(client, (EquipHealthPotion)message);
             else if (message is TargetMessage) OnObjectTargeted(client, (TargetMessage)message);
             else if (message is ACDClientTranslateMessage) OnPlayerMovement(client, (ACDClientTranslateMessage)message);
             else if (message is TryWaypointMessage) OnTryWaypoint(client, (TryWaypointMessage)message);
@@ -1934,21 +1935,30 @@ namespace NullD.Core.GS.Players
         private void OnRequestBuyItem(GameClient client, RequestBuyItemMessage requestBuyItemMessage)
         {
             var vendor = this.SelectedNPC as Vendor;
-            if (vendor == null)
+            var rarevendor = this.SelectedNPC as RareVendor;
+
+            if (vendor != null)
+                vendor.OnRequestBuyItem(this, requestBuyItemMessage.ItemId);
+            else if (rarevendor != null)
+                rarevendor.OnRequestBuyItem(this, requestBuyItemMessage.ItemId);
+            else
                 return;
-            vendor.OnRequestBuyItem(this, requestBuyItemMessage.ItemId);
         }
 
         private void OnRequestSellItem(GameClient client, RequestSellItemMessage requestSellItemMessage)
         {
             var player = this.InGameClient.Player;
+
             var vendor = this.SelectedNPC as Vendor;
+            var rarevendor = this.SelectedNPC as RareVendor;
 
             var item = this.Inventory.GetItem(requestSellItemMessage.ItemId);
             if (item == null)
                 return;
-
-            vendor.OnRequestSellItem(player, requestSellItemMessage.ItemId);
+            if (vendor != null)
+                vendor.OnRequestSellItem(player, requestSellItemMessage.ItemId);
+            else
+                rarevendor.OnRequestSellItem(player, requestSellItemMessage.ItemId);
         }
 
         //private void OnRequestAddSocket(GameClient client, RequestAddSocketMessage requestAddSocketMessage)

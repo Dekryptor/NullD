@@ -4,6 +4,7 @@ using NullD.Core.GS.Players;
 using NullD.Core.GS.Ticker;
 using NullD.Core.GS.Actors;
 using NullD.Core.GS.Common.Types.TagMap;
+using NullD.Net.GS.Message;
 
 namespace NullD.Core.GS.Powers.Implementations.General
 {
@@ -14,6 +15,16 @@ namespace NullD.Core.GS.Powers.Implementations.General
         {
             public override IEnumerable<TickTimer> Main()
             {
+                Player plr = (User as Player);
+                Items.Item ScrollToHome = null;
+
+                foreach (var item in plr.Inventory.GetBackPackItems())
+                    if (item.ActorSNO.Id == 5656)
+                    { ScrollToHome = item; break; }
+                
+                if (ScrollToHome == null)
+                    yield break;
+
                 Logger.Debug("Portal to New Tristram. Version 3.0");
                 int TargetWorld = -1;
                 int TargetArea = -1;
@@ -49,7 +60,13 @@ namespace NullD.Core.GS.Powers.Implementations.General
 
                 var ToHome = new Portal(User.World, 5648, New);// User.World.Game.GetWorld(TargetHome).StartingPoints[0].Tags);
 
-
+                if (ScrollToHome.Attributes[GameAttribute.ItemStackQuantityLo] <= 1)
+                    plr.Inventory.DestroyInventoryItem(ScrollToHome);
+                else
+                {
+                    ScrollToHome.Attributes[GameAttribute.ItemStackQuantityLo]--;
+                    ScrollToHome.Attributes.SendChangedMessage(plr.InGameClient);
+                }
 
                 ToHome.Scale = 0.9f;
                 Vector3D PositionToPortal = new Vector3D(User.Position.X, User.Position.Y + 3, User.Position.Z);

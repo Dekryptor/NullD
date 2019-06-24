@@ -129,8 +129,7 @@ namespace NullD.Core.GS.Players
         {
             System.Diagnostics.Debug.Assert(!_inventoryGrid.Contains(item) && !_equipment.IsItemEquipped(item), "Item already in inventory");
             // TODO: Autoequip when equipment slot is empty
-
-            // If Item is Stackable try to add the amount
+                // If Item is Stackable try to add the amount
             if (item.IsStackable())
             {
 
@@ -282,7 +281,9 @@ namespace NullD.Core.GS.Players
                 newItem.Attributes[GameAttribute.Damage_Weapon_Delta, 0] = originalItem.Attributes[GameAttribute.Damage_Weapon_Delta, 0];
                 newItem.AffixList = originalItem.AffixList;
             }
-
+            if (originalItem.ItemDefinition.Name == "TownPortalStone")
+                originalItem.ItemDefinition.MaxStackAmount = 20;
+                ;
             if (originalItem.ItemDefinition.MaxStackAmount > 1)
             {
                 var ItemDef = Items.ItemGenerator.GetItemDefinition(originalItem.ItemDefinition.Hash);

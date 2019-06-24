@@ -125,6 +125,8 @@ namespace NullD.Core.GS.Items
 
         public bool IsStackable()
         {
+            if (ItemDefinition.Name == "TownPortalStone")
+            { return true; }
             return ItemDefinition.MaxStackAmount > 1;
         }
 

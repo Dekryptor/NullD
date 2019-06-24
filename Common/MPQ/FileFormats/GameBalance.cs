@@ -274,7 +274,7 @@ namespace NullD.Common.MPQ.FileFormats
         public int I2 { get; private set; }
         public int RandomPropertiesCount { get; private set; }
         public int MaxSockets { get; private set; }
-        public int MaxStackAmount { get; private set; }
+        public int MaxStackAmount { get; set; }
         public int BaseGoldValue { get; private set; }
         public int I7 { get; private set; }
         public int RequiredLevel { get; private set; }
