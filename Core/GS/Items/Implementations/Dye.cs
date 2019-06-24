@@ -31,7 +31,7 @@ namespace NullD.Core.GS.Items.Implementations
     {
         private static Dictionary<int, int> DyeColorMap = new Dictionary<int, int>();
 
-        public Dye(World world, NullD.Common.MPQ.FileFormats.ItemTable definition)
+        public Dye(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
         }

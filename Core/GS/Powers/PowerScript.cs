@@ -57,5 +57,23 @@ namespace NullD.Core.GS.Powers
             targets.Actors.RemoveAll(actor => actor != bestEnemy);
             return targets;
         }
+
+        public TargetList GetBestMeleeEnemyWithRange(float mrange)
+        {
+            float meleeRange = mrange;  // TODO: possibly use equipped weapon range for this?
+
+            // get all targets that could be hit by melee attack, then select the script's target if
+            // it has one, otherwise use the closest target in range.
+            TargetList targets = GetEnemiesInBeamDirection(User.Position, TargetPosition, meleeRange);
+
+            Actor bestEnemy;
+            if (targets.Actors.Contains(Target))
+                bestEnemy = Target;
+            else
+                bestEnemy = targets.GetClosestTo(User.Position);
+
+            targets.Actors.RemoveAll(actor => actor != bestEnemy);
+            return targets;
+        }
     }
 }

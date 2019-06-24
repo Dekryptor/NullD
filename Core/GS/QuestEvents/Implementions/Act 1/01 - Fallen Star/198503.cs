@@ -126,7 +126,9 @@ namespace NullD.Core.GS.QuestEvents.Implementations
                 // ugly hack to get all actors with the same snoID..no idea if it is lmegit or if game will crash and summon diablo on my pc...
                 var actorsWM = world.GetActorsBySNO(wretchedMotherAID); // this is the List of wretched mother ACTOR ID
                 var actorWQM = world.GetActorBySNO(wretchedMotherQueenAID); // this is the wretched queen mother ACTOR ID
-
+                if (actorWQM == null)
+                    actorWQM = world.SpawnMonsterWithGet(wretchedMotherQueenAID, new Vector3D(2032.949f,2771.926f,40.15685f));
+                
                 Logger.Debug(" world contains {0} WM ", actorsWM.Count);
 
                 if (actorsWM.Count > 0)

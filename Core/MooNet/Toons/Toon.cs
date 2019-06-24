@@ -61,6 +61,17 @@ namespace NullD.Core.LogNet.Toons
                 return val;
             }
         }
+        public int Potion
+        {
+            get
+            {
+                return this.DBToon.DBActiveSkills.Potion;
+            }
+            private set
+            {
+                this.DBToon.DBActiveSkills.Potion = value;
+            }
+        }
         public bool Hardcore
         {
             get { return this.DBToon.Hardcore; }
@@ -327,7 +338,7 @@ namespace NullD.Core.LogNet.Toons
         {
             get
             {
-                return D3.Hero.Digest.CreateBuilder().SetVersion(902)
+                var Dig = D3.Hero.Digest.CreateBuilder().SetVersion(902)
                                 .SetHeroId(this.D3EntityID)
                                 .SetHeroName(this.Name)
                                 .SetGbidClass((int)this.ClassID)
@@ -342,7 +353,14 @@ namespace NullD.Core.LogNet.Toons
                                 .SetLastPlayedQuest(this.ActiveQuest)
                                 .SetLastPlayedQuestStep(this.StepIDofQuest)
                                 .SetTimePlayed(this.TimePlayed)
-                                .Build();
+                                ;
+
+                Dig.AddQuestHistory(new D3.Hero.QuestHistoryEntry.Builder().SetDifficulty(0).SetSnoQuest(114901));
+                Dig.AddQuestHistory(new D3.Hero.QuestHistoryEntry.Builder().SetDifficulty(0).SetSnoQuest(80322));
+                Dig.AddQuestHistory(new D3.Hero.QuestHistoryEntry.Builder().SetDifficulty(0).SetSnoQuest(93595));
+                Dig.AddQuestHistory(new D3.Hero.QuestHistoryEntry.Builder().SetDifficulty(0).SetSnoQuest(112498));
+
+                return Dig.Build();
             }
         }
 

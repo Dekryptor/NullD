@@ -5,7 +5,7 @@ using NullD.Core.GS.Actors.Implementations;
 using NullD.Net.GS.Message;
 using System;
 
-namespace NullD.Core.GS.QuestEvents.Implementions
+namespace NullD.Core.GS.QuestEvents.Implementations
 {
     class _166678 : QuestEvent
     {

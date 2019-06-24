@@ -349,6 +349,7 @@ namespace NullD.Core.GS.Items
                 //if (itemDefinition.Name.Contains("Debug"))  continue;
                 //if (itemDefinition.Quality == ItemTable.ItemQuality.Invalid) continue;
                 if (itemDefinition.Name.Contains("StaffOfCow")) continue;
+                if (itemDefinition.Name.Contains("NephalemCube")) continue;
                 if (itemDefinition.Name.Contains("BladeoftheAncients")) continue;
                 if (itemDefinition.Name.ToLower().Contains("book")) continue;
                 if (itemDefinition.Name.ToLower().Contains("staffofcow")) continue;
@@ -684,10 +685,10 @@ namespace NullD.Core.GS.Items
         // Creates an item based on supplied definition.
         public static Item CreateItem(NullD.Core.GS.Actors.Actor owner, ItemTable definition, bool Craft = false)
         {
-            // Logger.Trace("Creating item: {0} [sno:{1}, gbid {2}]", definition.Name, definition.SNOActor, StringHashHelper.HashItemName(definition.Name));
+            //Logger.Trace("Creating item: {0} [sno:{1}, gbid {2}]", definition.Name, definition.SNOActor, StringHashHelper.HashItemName(definition.Name));
 
             Type type = GetItemClass(definition);
-
+            
             var item = (Item)Activator.CreateInstance(type, new object[] { owner.World, definition, Craft });
 
             return item;

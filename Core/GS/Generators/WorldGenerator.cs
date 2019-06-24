@@ -47,6 +47,185 @@ namespace NullD.Core.GS.Generators
             var worldAsset = MPQStorage.Data.Assets[SNOGroup.Worlds][worldSNO];
             var worldData = (NullD.Common.MPQ.FileFormats.World)worldAsset.Data;
 
+            if (worldAsset.SNOId == 211471)
+                worldData.IsGenerated = false;
+            else if (worldAsset.SNOId == 132995)
+                worldData.IsGenerated = false;
+            else if (worldAsset.SNOId == 50588)
+                worldData.IsGenerated = false;
+
+            else if (worldAsset.SNOId == 81019) //a3dun_rmpt_Level01
+                worldData.IsGenerated = false;
+
+            else if (worldAsset.SNOId == 2826)
+            {
+                //1 Уровень залов агонии 
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 146619)
+            {
+                //Переход к тюрьме Адрии
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 58982)
+            {
+                //2 Уровень залов агонии
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 58983)
+            {
+                //3 Уровень залов агонии
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 60395)
+            {
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 109525)//Первый демонический разлом
+            {
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 109530)//Второй демонический разлом
+            {
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 219659)//Второй уровень садов
+            {
+                worldData.IsGenerated = false;
+            }
+            //Подземелья на кладбище.
+            else if (worldAsset.SNOId == 72636 ||  //[072636] trDun_Crypt_FalsePassage_01
+                     worldAsset.SNOId == 72637 ||  //[072637] trDun_Crypt_FalsePassage_02
+                     worldAsset.SNOId == 154587 || //[154587] trdun_Crypt_SkeletonKingCrown_00 
+                     worldAsset.SNOId == 60600 || //[060600] trdun_Crypt_SkeletonKingCrown_01
+                     worldAsset.SNOId == 102299 || //[102299] trDun_Crypt_Fields_Flooded_Memories_Level01
+                     worldAsset.SNOId == 165797)   //[165797] trDun_Crypt_Fields_Flooded_Memories_Level02
+            {
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 180550)
+            {
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 50584)
+            {
+                //4 Уровень собора
+                //worldData.IsGenerated = false;
+                /*
+                [032936] trDun_Cath_01_Filler
+                [032938] trDun_Cath_E
+                [032939] trDun_Cath_EW_01
+                [032941] trDun_Cath_EW_Hall_01
+                [032943] trDun_Cath_E_Dead_End_01
+                [032948] trDun_Cath_E_Exit_Crypt_01
+                [032951] trDun_Cath_NEW_01
+                [032952] trDun_Cath_NE_01
+                [032954] trDun_Cath_NE_Hall_01
+                [032955] trDun_Cath_NE_Hall_02
+                [032956] trDun_Cath_NE_Hall_03
+                [032957] trDun_Cath_NE_Hall_04
+                [032958] trDun_Cath_NSEW_01
+                [032960] trDun_Cath_NSE_01
+                [032961] trDun_Cath_NS_01
+                [032963] trDun_Cath_NS_Hall_01
+                [032964] trDun_Cath_NS_Hall_02
+                [032965] trDun_Cath_NW_01
+                [032967] trDun_Cath_NW_Hall_01
+                [032968] trDun_Cath_NW_Hall_02
+                [032969] trDun_Cath_N_01
+                [032970] trDun_Cath_N_02
+                [032971] trDun_Cath_N_Dead_End_01
+                
+                [032940] trDun_Cath_EW_Entrance_01 - four level
+                [032992] trDun_Cath_S_Entrance_01 - second level
+                [033000] trDun_Cath_W_Entrance_01 - third level
+                [032974] trDun_Cath_N_Entrance_02
+                [032975] trDun_Cath_N_Entrance_03
+                [032944] trDun_Cath_E_Entrance01 - Лицей
+                [032945] trDun_Cath_E_Entrance_02 -/
+                
+                [032976] trDun_Cath_N_Exit_01
+                [033001] trDun_Cath_W_Exit_01
+                [032946] trDun_Cath_E_Exit
+                [032947] trDun_Cath_E_Exit_02 - Конец.
+                [
+                [032979] trDun_Cath_SEW_01
+                [032981] trDun_Cath_SE_01
+                [032982] trDun_Cath_SE_Hall_01
+                [032983] trDun_Cath_SE_Hall_02
+                [032984] trDun_Cath_SE_Hall_03
+                [032985] trDun_Cath_SW_01
+                [032986] trDun_Cath_SW_Hall_01
+                [032987] trDun_Cath_SW_Hall_02
+                [032989] trDun_Cath_S_01
+                [032990] trDun_Cath_S_02_Stranger
+                [032991] trDun_Cath_S_Dead_End_01
+                [032993] trDun_Cath_S_Exit_01
+                [032995] trDun_Cath_S_Exit_03
+                [032997] trDun_Cath_S_Exit_Crypt_02
+                [032999] trDun_Cath_W_Dead_End_01
+                [033002] trDun_Cath_W_Exit_Crypt_01
+                [136166] trDun_Cath_E_DungeonStone_Exit_01
+                [136167] trDun_Cath_N_DungeonStone_Exit_01
+                [136168] trDun_Cath_S_DungeonStone_Exit_01
+                [136170] trDun_Cath_W_DungeonStone_Exit_01
+                [001883] trDun_Cath_EW_Hall_02
+                [001884] trDun_Cath_NSW_01
+                [001885] trDun_Cath_SEW_02 -???
+                [001886] trDun_Cath_W_01
+                [091612] trDun_Cath_NSEW_02_Templar
+                [060885] trDun_Cath_Cain_Intro_01
+                [066589] trDun_Cath_NE_02
+                [066919] trDun_Cath_NS_02
+                [066925] trDun_Cath_SE_02
+                [067021] trDun_Cath_EW_02 - Мужик в трусах)
+                */
+
+            }
+            else if (worldAsset.SNOId == 121579)
+            {
+                //Первый уровень шпиля
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 105406)
+            {
+                //3 Уровень собора
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 50582)
+            {
+
+                //2 Уровень собора 334-357
+                worldData.IsGenerated = false;
+            }
+            else if (worldAsset.SNOId == 117405)
+            {
+
+                //worldData.IsGenerated = true;
+
+            }
+            //trDun_Cave_Middle_RiverA - затопленный храм.
+            //trDun_Cave_Middle_ChasmA - Пристанище войнов.
+            //trDun_Cave_Middle_LostCampA - 
+
+            else if (worldAsset.SNOId == 119888)
+            {
+                worldData.IsGenerated = false;
+                /*
+                 
+                [116976] trDun_Cave_Goat_NSEW_02
+                [075138] trDun_Cave_Goat_S_Entrance_01
+                [075141] trDun_Cave_Goat_NE_01
+                [075144] trDun_Cave_Goat_NSW_01
+                [075186] trDun_Cave_Goat_NS_01
+                [075261] trDun_Cave_Goat_EW_01
+                [075353] trDun_Cave_Goat_NSEW_01
+                [075606] trDun_Cave_Goat_W_Entrance_01
+
+
+                 */
+
+            }
 
             if (worldData.IsGenerated)
             {
@@ -642,172 +821,330 @@ namespace NullD.Core.GS.Generators
         /// <param name="world">The world to which to add loaded actors</param>
         private static void loadLevelAreas(Dictionary<int, List<Scene>> levelAreas, World world)
         {
-            /// Each Scene has one to four level areas assigned to it. I dont know if that means
-            /// the scene belongs to both level areas or if the scene is split
-            /// Scenes marker tags have generic GizmoLocationA to Z that are used 
-            /// to provide random spawning possibilities.
-            /// For each of these 26 LocationGroups, the LevelArea has a entry in its SpawnType array that defines
-            /// what type of actor/encounter/adventure could spawn there
-            /// 
-            /// It could for example define, that for a level area X, out of the four spawning options
-            /// two are randomly picked and have barrels placed there
-
-            // Create an array of mobs, used with the loadActor in the load monster area loop
-            // Each monster are created in NullD.Core.GS.Actors.Implementations.Monsters
-            // By Poluxxx
-            //int[] aSNO = new int[] {
-            //       // 6652      // Zombie
-            //         6443      // Ravenous
-            //        //, 136943    // Ghost
-            //};
             Dictionary<PRTransform, NullD.Common.MPQ.FileFormats.Actor> dict = new Dictionary<PRTransform, NullD.Common.MPQ.FileFormats.Actor>();
             foreach (int la in levelAreas.Keys)
             {
-                SNOHandle levelAreaHandle = new SNOHandle(SNOGroup.LevelArea, la);
-                if (!levelAreaHandle.IsValid)
-                {
-                    Logger.Warn("Level area {0} does not exist", la);
-                    continue;
-                }
-                var levelArea = levelAreaHandle.Target as LevelArea;
-
-                for (int i = 0; i < 26; i++)
-                {
-                    // Merge the gizmo starting locations from all scenes and
-                    // their subscenes into a single list for the whole level area
-                    List<PRTransform> gizmoLocations = new List<PRTransform>();
-                    foreach (var scene in levelAreas[la])
-                    {
-                        if (scene.GizmoSpawningLocations[i] != null)
-                            gizmoLocations.AddRange(scene.GizmoSpawningLocations[i]);
-                        foreach (Scene subScene in scene.Subscenes)
-                        {
-                            if (subScene.GizmoSpawningLocations[i] != null)
-                                gizmoLocations.AddRange(subScene.GizmoSpawningLocations[i]);
-                        }
-                    }
-
-                    // Load all spawns that are defined for that location group 
-                    foreach (GizmoLocSpawnEntry spawnEntry in levelArea.LocSet.SpawnType[i].SpawnEntry)
-                    {
-                        // Get a random amount of spawns ...
-                        int amount = RandomHelper.Next(spawnEntry.Max, spawnEntry.Max);
-                        if (amount > gizmoLocations.Count)
-                        {
-                            Logger.Trace("Breaking after spawnEntry {0} for LevelArea {1} because there are less locations ({2}) than spawn amount ({3}, {4} min)", spawnEntry.SNOHandle, levelAreaHandle, gizmoLocations.Count, amount, spawnEntry.Min);
-                            break;
-                        }
-
-                        Logger.Trace("Spawning {0} ({3} - {4} {1} in {2}", amount, spawnEntry.SNOHandle, levelAreaHandle, spawnEntry.Min, spawnEntry.Max);
-
-                        // ...and place each one on a random position within the location group
-                        for (; amount > 0; amount--)
-                        {
-                            int location = RandomHelper.Next(gizmoLocations.Count - 1);
-
-                            switch (spawnEntry.SNOHandle.Group)
-                            {
-                                case SNOGroup.Actor:
-                                    //TODO: Why to pass tagmap here and not load it inside Actor
-                                    loadActor(spawnEntry.SNOHandle, gizmoLocations[location], world, ((NullD.Common.MPQ.FileFormats.Actor)spawnEntry.SNOHandle.Target).TagMap);
-                                    break;
-                                case SNOGroup.Encounter:
-                                    var encounter = spawnEntry.SNOHandle.Target as Encounter;
-                                    var actor = RandomHelper.RandomItem(encounter.Spawnoptions, x => x.Probability);
-                                    var actorHandle = new SNOHandle(actor.SNOSpawn);
-                                    loadActor(actorHandle, gizmoLocations[location], world, ((NullD.Common.MPQ.FileFormats.Actor)actorHandle.Target).TagMap);
-                                    break;
-                                case SNOGroup.Adventure:
-                                    // Adventure are basically made up of a markerSet that has relative PRTransforms
-                                    // it has some other fields that are always 0 and a reference to a symbol actor
-                                    // no idea what they are used for - farmy
-
-                                    var adventure = spawnEntry.SNOHandle.Target as Adventure;
-                                    var markerSet = new SNOHandle(adventure.SNOMarkerSet).Target as MarkerSet;
-
-                                    foreach (var marker in markerSet.Markers)
-                                    {
-                                        // relative marker set coordinates to absolute world coordinates
-                                        var absolutePRTransform = new PRTransform
-                                        {
-                                            Vector3D = marker.PRTransform.Vector3D + gizmoLocations[location].Vector3D,
-                                            Quaternion = new Quaternion
-                                            {
-                                                Vector3D = new Vector3D(marker.PRTransform.Quaternion.Vector3D.X, marker.PRTransform.Quaternion.Vector3D.Y, marker.PRTransform.Quaternion.Vector3D.Z),
-                                                W = marker.PRTransform.Quaternion.W
-                                            }
-                                        };
-                                        switch (marker.Type)
-                                        {
-                                            case MarkerType.Actor:
-                                                loadActor(marker.SNOHandle, absolutePRTransform, world, marker.TagMap);
-                                                break;
-
-                                            case MarkerType.Encounter:
-                                                var encounter2 = marker.SNOHandle.Target as Encounter;
-                                                var actor2 = RandomHelper.RandomItem(encounter2.Spawnoptions, x => x.Probability);
-                                                loadActor(new SNOHandle(actor2.SNOSpawn), absolutePRTransform, world, marker.TagMap);
-                                                break;
-
-                                            default:
-                                                Logger.Warn("Unhandled marker type {0} in actor loading", marker.Type);
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    if (spawnEntry.SNOHandle.Id != -1)
-                                        Logger.Warn("Unknown sno handle in LevelArea spawn entries: {0}", spawnEntry.SNOHandle);
-                                    break;
-                            }
-
-                            // dont use that location again
-                            gizmoLocations.RemoveAt(location);
-
-                        }
-                    }
-                }
-
                 // Load monsters for level area
                 foreach (var scene in levelAreas[la])
                 {
                     // HACK: don't spawn monsters in tristram town scenes /mdz
-                    if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Tristram_"))
+                    List<int> monsterActors = new List<int>();
+                    int MaxUnits = 100;
+                    if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Tristram_") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_TownAttack") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Highlands_Entrance_E08") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Highlands_Entrance_E07") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Highlands_Entrance_E06") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Highlands_Entrance_E05") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.Contains("Throne") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.Contains("Filler") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.Contains("Exit") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.Contains("Cain") ||
+                        MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.Contains("MainGraveyard"))
                         continue;
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Old_Tristram") || MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_oldTristram"))
+                    {
+                        monsterActors.Add(6652);
+                        monsterActors.Add(6644);
+                    }
+                    //Дорога из нового тристрама к кладбищу - Лощина стенаний
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Wilderness"))
+                    {
+                        monsterActors.Add(6652);
+                        monsterActors.Add(6644);
+                    }
+                    //Собор
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trDun_Cath"))
+                    {
+                        monsterActors.Add(5346);
+                        monsterActors.Add(5393);
+                        monsterActors.Add(6024);
+                        monsterActors.Add(6356);//Unburied_A
 
+                    }
+                    //Гиблые поля
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_TristramFields"))
+                    {
+                        monsterActors.Add(218428);
+                        monsterActors.Add(4282);
+                    }
+                    //Гниющий Лес 
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_FesteringWoods"))
+                    {
+                        monsterActors.Add(121203);
+                        monsterActors.Add(4153);
+                    }
+                    //Высокогорье
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Highlands"))
+                    {
+                        //monsterActors.Add(6652);
+                        //monsterActors.Add(6644);
+                    }
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("a1dun_Random"))
+                    {
+                        monsterActors.Add(210502);
+                        monsterActors.Add(192965);
+                        monsterActors.Add(207560);
+
+                        /*
+                            [218802] TentacleHorse_A_Unique_02
+                            [218804] TentacleHorse_Fat_A_Unique_01
+                            [218806] TentacleHorse_A_Unique_03
+                            [218807] TentacleHorse_A_Unique_04
+                            [218808] TentacleHorse_A_Unique_05
+                            [192965] TentacleHorse_A
+                            [193222] TentacleHorse_Split_model
+                            [201679] TentacleHorse_B_Unique_01
+                            [207378] TentacleHorse_Fat_A
+                            [207444] TentacleHorse_Fat_Split_model
+                            [207559] TentacleHorse_Fat_B
+                            [207560] TentacleHorse_B
+                            [207563] TentacleHorse_B_Split_model
+                            [207566] TentacleHorse_Fat_B_Split_model
+                            [208659] g_Portal_Tentacle - Выход
+                            [209083] g_Portal_Tentacle_Trist - Вход
+                            [209087] tentacleFlower
+                            [209133] TentacleLord - Король коров
+                            [209506] TentacleHorse_A_Unique_01
+                            [209633] tentacleFrog_A
+                            [210502] TentacleBear_A
+                            [212664] TentacleBear_A_Unique_01
+                            [212667] tentacleFlower_A_Unique_01
+                            [214874] TentacleHorse_C_Split_model
+                            [214948] TentacleHorse_C_Unique_01 
+                        */
+                        //monsterActors.Add(6644);
+                    }
+                    //Подземелье короля и на кладбище.
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trDun_Crypt"))
+                    {
+                        //monsterActors.Add(6652);
+                        monsterActors.Add(5346);
+                        monsterActors.Add(5393);
+                        MaxUnits = 300;
+                    }
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("a4dun_garden_level"))
+                    {
+                        monsterActors.Add(106711); //Angel
+                        //monsterActors.Add(106708); //BigRed
+                        //MaxUnits = 30;
+                        /*  [149875] [Power] BigRed_Charge     [150552] [Power] BigRed_FireBreath  */
+                    }
+                    else if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("a4dun_Hell"))
+                    {
+                        monsterActors.Add(197493);
+                        monsterActors.Add(197495);
+                        monsterActors.Add(197496);
+                        MaxUnits = 50;
+                        //monsterActors.Add(6644);
+                    }
                     // a little variety in monsters spawned
-                    int[] monsterActors = { 6652, 219725, 5346, 6356, 5393, 434, 4982 };
 
-                    for (int i = 0; i < 100; i++)
+                    //int[] monsterActors = { 6652, 219725, 5346, 6356, 5393, 434, 4982 };
+
+                    for (int i = 0; i < MaxUnits; i++)
                     {
                         if (RandomHelper.NextDouble() > 0.8)
                         {
-                            // TODO Load correct spawn population
-                            // 2.5 is units per square, TODO: Find out how to calculate units per square. Is it F1 * V0.I1 / SquareCount?
-                            int x = RandomHelper.Next(scene.NavMesh.SquaresCountX);
-                            int y = RandomHelper.Next(scene.NavMesh.SquaresCountY);
-
-                            if ((scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Flags & NullD.Common.MPQ.FileFormats.Scene.NavCellFlags.NoSpawn) == 0)
+                            try
                             {
-                                loadActor(
-                                    new SNOHandle(monsterActors[RandomHelper.Next(monsterActors.Length)]),
-                                    new PRTransform
-                                    {
-                                        Vector3D = new Vector3D
+
+                                // TODO Load correct spawn population
+                                // 2.5 is units per square, TODO: Find out how to calculate units per square. Is it F1 * V0.I1 / SquareCount?
+                                int x = RandomHelper.Next(scene.NavMesh.SquaresCountX);
+                                int y = RandomHelper.Next(scene.NavMesh.SquaresCountY);
+
+                                if ((scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Flags & NullD.Common.MPQ.FileFormats.Scene.NavCellFlags.NoSpawn) == 0)
+                                {
+                                    int Num = RandomHelper.Next(monsterActors.Count);
+                                    loadActor(
+                                        new SNOHandle(monsterActors[Num]),
+                                        new PRTransform
                                         {
-                                            X = (float)(x * 2.5 + scene.Position.X),
-                                            Y = (float)(y * 2.5 + scene.Position.Y),
-                                            Z = scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Z + scene.Position.Z
+                                            Vector3D = new Vector3D
+                                            {
+                                                X = (float)(x * 2.5 + scene.Position.X),
+                                                Y = (float)(y * 2.5 + scene.Position.Y),
+                                                Z = scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Z + scene.Position.Z
+                                            },
+                                            Quaternion = Quaternion.FacingRotation((float)(RandomHelper.NextDouble() * System.Math.PI * 2))
                                         },
-                                        Quaternion = Quaternion.FacingRotation((float)(RandomHelper.NextDouble() * System.Math.PI * 2))
-                                    },
-                                    world,
-                                    new TagMap()
-                                    );
+                                        world,
+                                        new TagMap()
+                                        );
+                                }
+                            }
+                            catch { continue; }
+                        }
+
+                    }
+                    #region Старая система прогрузки зон.
+                    /*
+                    try
+                    {
+                        SNOHandle levelAreaHandle = new SNOHandle(SNOGroup.LevelArea, la);
+                        if (!levelAreaHandle.IsValid)
+                        {
+                            //Пропуск пустой зоны
+                            //Logger.Warn("Level area {0} does not exist", la);
+                            continue;
+                        }
+                        var levelArea = levelAreaHandle.Target as LevelArea;
+
+                        for (int i = 0; i < 10; i++)
+                        {
+                            // Merge the gizmo starting locations from all scenes and
+                            // their subscenes into a single list for the whole level area
+                            List<PRTransform> gizmoLocations = new List<PRTransform>();
+
+                            foreach (var scene in levelAreas[la])
+                            {
+                                if (scene.GizmoSpawningLocations[i] != null)
+                                    gizmoLocations.AddRange(scene.GizmoSpawningLocations[i]);
+                                foreach (Scene subScene in scene.Subscenes)
+                                {
+                                    if (subScene.GizmoSpawningLocations[i] != null)
+                                        gizmoLocations.AddRange(subScene.GizmoSpawningLocations[i]);
+                                }
+                            }
+
+                            // Load all spawns that are defined for that location group 
+                            foreach (GizmoLocSpawnEntry spawnEntry in levelArea.LocSet.SpawnType[i].SpawnEntry)
+                            {
+                                // Get a random amount of spawns ...
+                                int amount = RandomHelper.Next(spawnEntry.Max, spawnEntry.Max);
+                                if (amount > gizmoLocations.Count)
+                                {
+                                    Logger.Trace("Breaking after spawnEntry {0} for LevelArea {1} because there are less locations ({2}) than spawn amount ({3}, {4} min)", spawnEntry.SNOHandle, levelAreaHandle, gizmoLocations.Count, amount, spawnEntry.Min);
+                                    break;
+                                }
+
+                                Logger.Trace("Spawning {0} ({3} - {4} {1} in {2}", amount, spawnEntry.SNOHandle, levelAreaHandle, spawnEntry.Min, spawnEntry.Max);
+
+                                // ...and place each one on a random position within the location group
+                                for (; amount > 0; amount--)
+                                {
+                                    int location = RandomHelper.Next(gizmoLocations.Count - 1);
+
+                                    switch (spawnEntry.SNOHandle.Group)
+                                    {
+                                        case SNOGroup.Actor:
+                                            //TODO: Why to pass tagmap here and not load it inside Actor
+                                            loadActor(spawnEntry.SNOHandle, gizmoLocations[location], world, ((DiIiS.Common.MPQ.FileFormats.Actor)spawnEntry.SNOHandle.Target).TagMap);
+                                            break;
+                                        case SNOGroup.Encounter:
+                                            var encounter = spawnEntry.SNOHandle.Target as Encounter;
+                                            var actor = RandomHelper.RandomItem(encounter.Spawnoptions, x => x.Probability);
+                                            var actorHandle = new SNOHandle(actor.SNOSpawn);
+                                            loadActor(actorHandle, gizmoLocations[location], world, ((DiIiS.Common.MPQ.FileFormats.Actor)actorHandle.Target).TagMap);
+                                            break;
+                                        case SNOGroup.Adventure:
+                                            // Adventure are basically made up of a markerSet that has relative PRTransforms
+                                            // it has some other fields that are always 0 and a reference to a symbol actor
+                                            // no idea what they are used for - farmy
+
+                                            var adventure = spawnEntry.SNOHandle.Target as Adventure;
+                                            var markerSet = new SNOHandle(adventure.SNOMarkerSet).Target as MarkerSet;
+
+                                            foreach (var marker in markerSet.Markers)
+                                            {
+                                                // relative marker set coordinates to absolute world coordinates
+                                                var absolutePRTransform = new PRTransform
+                                                {
+                                                    Vector3D = marker.PRTransform.Vector3D + gizmoLocations[location].Vector3D,
+                                                    Quaternion = new Quaternion
+                                                    {
+                                                        Vector3D = new Vector3D(marker.PRTransform.Quaternion.Vector3D.X, marker.PRTransform.Quaternion.Vector3D.Y, marker.PRTransform.Quaternion.Vector3D.Z),
+                                                        W = marker.PRTransform.Quaternion.W
+                                                    }
+                                                };
+                                                switch (marker.Type)
+                                                {
+                                                    case MarkerType.Actor:
+                                                        loadActor(marker.SNOHandle, absolutePRTransform, world, marker.TagMap);
+                                                        break;
+
+                                                    case MarkerType.Encounter:
+                                                        var encounter2 = marker.SNOHandle.Target as Encounter;
+                                                        var actor2 = RandomHelper.RandomItem(encounter2.Spawnoptions, x => x.Probability);
+                                                        loadActor(new SNOHandle(actor2.SNOSpawn), absolutePRTransform, world, marker.TagMap);
+                                                        break;
+
+                                                    default:
+                                                        Logger.Warn("Unhandled marker type {0} in actor loading", marker.Type);
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            if (spawnEntry.SNOHandle.Id != -1)
+                                                Logger.Warn("Unknown sno handle in LevelArea spawn entries: {0}", spawnEntry.SNOHandle);
+                                            break;
+                                    }
+
+                                    // dont use that location again
+                                    gizmoLocations.RemoveAt(location);
+
+                                }
                             }
                         }
+                        // Load monsters for level area
+                        foreach (var scene in levelAreas[la])
+                        {
+                            // HACK: don't spawn monsters in tristram town scenes /mdz
+                            try
+                            {
+                                if (MPQStorage.Data.Assets[SNOGroup.Scene][scene.SceneSNO.Id].Name.StartsWith("trOut_Tristram_"))
+                                    continue;
+                            }
+                            catch { continue; }
+                            // a little variety in monsters spawned
+                            int[] monsterActors = { 6652, 219725, 5346, 6356, 5393, 434, 4982 };
+
+                            for (int i = 0; i < 100; i++)
+                            {
+                                if (RandomHelper.NextDouble() > 0.8)
+                                {
+                                    try
+                                    {
+                                        // TODO Load correct spawn population
+                                        // 2.5 is units per square, TODO: Find out how to calculate units per square. Is it F1 * V0.I1 / SquareCount?
+                                        int x = RandomHelper.Next(scene.NavMesh.SquaresCountX);
+                                        int y = RandomHelper.Next(scene.NavMesh.SquaresCountY);
+
+                                        if ((scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Flags & DiIiS.Common.MPQ.FileFormats.Scene.NavCellFlags.NoSpawn) == 0)
+                                        {
+                                            loadActor(
+                                                new SNOHandle(monsterActors[RandomHelper.Next(monsterActors.Length)]),
+                                                new PRTransform
+                                                {
+                                                    Vector3D = new Vector3D
+                                                    {
+                                                        X = (float)(x * 2.5 + scene.Position.X),
+                                                        Y = (float)(y * 2.5 + scene.Position.Y),
+                                                        Z = scene.NavMesh.Squares[y * scene.NavMesh.SquaresCountX + x].Z + scene.Position.Z
+                                                    },
+                                                    Quaternion = Quaternion.FacingRotation((float)(RandomHelper.NextDouble() * System.Math.PI * 2))
+                                                },
+                                                world,
+                                                new TagMap()
+                                                );
+                                        }
+                                    }
+                                    catch { continue; }
+                                }
+
+                            }
+
+
+                        }
+                        Logger.Debug("Level area {0} complete", la);
                     }
+                    catch { Logger.Debug("Level area {0} incomplete", la); continue; }
+                    */
+                    #endregion
                 }
+
             }
         }
 

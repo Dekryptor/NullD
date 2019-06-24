@@ -37,6 +37,9 @@ using NullD.Core.GS.Actors.Implementations.Hirelings;
 using System.Threading.Tasks;
 using NullD.Core.GS.Common.Types.Math;
 using System.Collections.Generic;
+using NullD.Net.LogNet;
+using NullD.Common.Storage;
+using NullD.Common.Storage.AccountDataBase.Entities;
 
 namespace NullD.Core.GS.Games
 {
@@ -145,13 +148,28 @@ namespace NullD.Core.GS.Games
         /// Creates a new game with given gameId.
         /// </summary>
         /// <param name="gameId"></param>
-        public Game(int gameId)
+        public Game(int gameId, List<LogNetClient> clients)
         {
             this.GameId = gameId;
             this.Players = new ConcurrentDictionary<GameClient, Player>();
             this._objects = new ConcurrentDictionary<uint, DynamicObject>();
             this._worlds = new ConcurrentDictionary<int, World>();
+
             this.StartingWorldSNOId = 71150; // FIXME: This must be set according to the game settings (start quest/act). Better yet, track the player's save point and toss this stuff. /komiga
+            switch (clients[0].Account.CurrentGameAccount.CurrentToon.ActiveAct)
+            {
+                case 100:
+                    StartingWorldSNOId = 161472;
+                    break;
+                case 200:
+                    StartingWorldSNOId = 172909;
+                    break;
+                case 300:
+                    StartingWorldSNOId = 178152;
+                    break;
+            }
+            
+
             this.Quests = new QuestManager(this);
 
             this._tickWatch = new Stopwatch();
@@ -254,7 +272,7 @@ namespace NullD.Core.GS.Games
         public void Enter(Player joinedPlayer)
         {
             this.Players.TryAdd(joinedPlayer.InGameClient, joinedPlayer);
-
+            
             // send all players in the game to new player that just joined (including him)
             foreach (var pair in this.Players)
             {
@@ -287,12 +305,15 @@ namespace NullD.Core.GS.Games
             {
                 case 100:
                     GameData.NowAct = 100;
+                    StartingWorldSNOId = 161472;
                     break;
                 case 200:
                     GameData.NowAct = 200;
+                    StartingWorldSNOId = 172909;
                     break;
                 case 300:
                     GameData.NowAct = 300;
+                    StartingWorldSNOId = 178152;
                     break;
             }
             joinedPlayer.InGameClient.SendMessage(new GameSyncedDataMessage
@@ -439,7 +460,6 @@ namespace NullD.Core.GS.Games
 
                 }
             }
-
             #region Прохождение игры 2.0 и Хард Фиксы
             if (joinedPlayer.Toon.ActiveQuest != -1)
             {
@@ -491,6 +511,19 @@ namespace NullD.Core.GS.Games
                         if (joinedPlayer.Toon.StepIDofQuest == 44)
                             StartingWorld.Game.Quests.NotifyQuest(72061, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterWorld, 50585);
 
+                }
+                if (joinedPlayer.Toon.ActiveAct == 100)
+                {
+                    var a = StartingWorld.StartingPoints;
+                    joinedPlayer.EnterWorld(this.StartingWorld.StartingPoints.Find(x => x.ActorSNO.Name == "Start_Location_Team_0").Position);
+                }
+                if (joinedPlayer.Toon.ActiveAct == 200)
+                {
+                    joinedPlayer.EnterWorld(StartingWorld.StartingPoints.Last().Position);
+                }
+                if (joinedPlayer.Toon.ActiveAct == 300)
+                {
+                    joinedPlayer.EnterWorld(StartingWorld.StartingPoints.Last().Position);
                 }
             }
             else
@@ -680,10 +713,27 @@ namespace NullD.Core.GS.Games
                 ActorID = joinedPlayer.DynamicID,
             });
 
+            var dbArtisans = DBSessions.AccountSession.Get<DBArtisansOfToon>(joinedPlayer.Toon.PersistentID);
             target.InGameClient.SendMessage(joinedPlayer.GetPlayerBanner()); // send player banner proto - D3.GameMessage.PlayerBanner
-            target.InGameClient.SendMessage(joinedPlayer.GetBlacksmithData()); // send player artisan proto /fasbat
-            target.InGameClient.SendMessage(joinedPlayer.GetJewelerData());
-            target.InGameClient.SendMessage(joinedPlayer.GetMysticData());
+            if (target.Toon.MaximumQuest != -1 &
+              target.Toon.MaximumQuest != 87000 &
+              target.Toon.MaximumQuest != 72095 &
+              target.Toon.MaximumQuest != 72221)
+            {
+                target.InGameClient.SendMessage(joinedPlayer.GetBlacksmithData(dbArtisans)); // Modded by AiDiEvE
+            }
+            else
+            {
+                target.InGameClient.SendMessage(joinedPlayer.GetBlacksmithDataFixInt(0));
+                StartingWorld.Leave(StartingWorld.GetActorBySNO(56947)); //Кузнец
+                StartingWorld.Leave(StartingWorld.GetActorBySNO(4062));  //Чародейка
+                StartingWorld.Leave(StartingWorld.GetActorBySNO(4644));  //Хитрожопый)
+                StartingWorld.Leave(StartingWorld.GetActorBySNO(4538));  //Храмовник
+            }
+            target.InGameClient.SendMessage(joinedPlayer.GetJewelerData(dbArtisans));
+            target.InGameClient.SendMessage(joinedPlayer.GetMysticData(dbArtisans));
+
+            DBSessions.AccountSession.Flush();
         }
 
         #endregion

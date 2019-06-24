@@ -27,18 +27,17 @@ namespace NullD.Core.GS.Items.Implementations
     [HandledType("HealthPotion")]
     public class HealthPotion : Potion
     {
-        public HealthPotion(Map.World world, ItemTable definition)
+        public HealthPotion(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
         }
 
         public override void OnRequestUse(GS.Players.Player player, Item target, int actionId, Net.GS.Message.Fields.WorldPlace worldPlace)
         {
-            if (player.Attributes[GameAttribute.Hitpoints_Cur] == player.Attributes[GameAttribute.Hitpoints_Max])
+
+            if (player.Attributes[GameAttribute.Hitpoints_Cur] == player.Attributes[GameAttribute.Hitpoints_Max_Total])
                 return; // TODO Error msg? /fasbat
-            player.Attributes[GameAttribute.Hitpoints_Cur] =
-                Math.Min(player.Attributes[GameAttribute.Hitpoints_Cur] + this.Attributes[GameAttribute.Hitpoints_Granted],
-                player.Attributes[GameAttribute.Hitpoints_Max]);
+            player.Attributes[GameAttribute.Hitpoints_Cur] = player.Attributes[GameAttribute.Hitpoints_Cur] + this.Attributes[GameAttribute.Hitpoints_Granted];
 
             player.Attributes.BroadcastChangedIfRevealed();
 

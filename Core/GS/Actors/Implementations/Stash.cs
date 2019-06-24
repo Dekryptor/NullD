@@ -29,7 +29,10 @@ namespace NullD.Core.GS.Actors.Implementations
     {
         public Stash(World world, int snoId, TagMap tags)
             : base(world, snoId, tags)
-        { }
+        {
+            this.Attributes[Net.GS.Message.GameAttribute.MinimapActive] = true;
+            this.Attributes.BroadcastChangedIfRevealed();
+        }
 
         public override void OnTargeted(Player player, TargetMessage message)
         {

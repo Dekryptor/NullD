@@ -142,7 +142,7 @@ namespace NullD.Core.GS.Actors
                         case GizmoGroup.CathedralIdol:
 
                         case GizmoGroup.Headstone:
-                        case GizmoGroup.HearthPortal:
+                        
                         //case GizmoGroup.NephalemAltar:
                         case GizmoGroup.Passive:
                         case GizmoGroup.PlayerSharedStash:
@@ -156,6 +156,8 @@ namespace NullD.Core.GS.Actors
                         case GizmoGroup.Switch:
                             //Logger.Info("GizmoGroup {0} has no proper implementation, using default gizmo instead", actorData.TagMap[ActorKeys.GizmoGroup]);
                             return CreateGizmo(world, snoId, tags);
+                        case GizmoGroup.HearthPortal:
+                            return null;
                         default:
                             Logger.Warn("Unknown gizmo group {0}", actorData.TagMap[ActorKeys.GizmoGroup]);
                             return CreateGizmo(world, snoId, tags);

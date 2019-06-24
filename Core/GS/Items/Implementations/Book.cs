@@ -31,7 +31,7 @@ namespace NullD.Core.GS.Items.Implementations
 
         public int LoreSNOId { get; private set; }
 
-        public Book(World world, NullD.Common.MPQ.FileFormats.ItemTable definition)
+        public Book(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
             var actorData = ActorSNO.Target as NullD.Common.MPQ.FileFormats.Actor;

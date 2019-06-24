@@ -21,7 +21,7 @@ namespace NullD.Core.GS.Items.Implementations
     [HandledItem("StoneOfRecall")]
     class StoneOfRecall : Item
     {
-        public StoneOfRecall(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition)
+        public StoneOfRecall(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
         }

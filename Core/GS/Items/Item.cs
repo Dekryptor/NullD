@@ -611,7 +611,57 @@ namespace NullD.Core.GS.Items
 
         public virtual void OnRequestUse(Player player, Item target, int actionId, WorldPlace worldPlace)
         {
-            throw new System.NotImplementedException();
+            if (this.ItemType.Name == "HealthPotion")
+            {
+                if (player.Attributes[GameAttribute.Hitpoints_Cur] == player.Attributes[GameAttribute.Hitpoints_Max])
+                    return; // TODO Error msg? /fasbat
+                player.Attributes[GameAttribute.Hitpoints_Cur] = player.Attributes[GameAttribute.Hitpoints_Cur] + this.Attributes[GameAttribute.Hitpoints_Granted];
+
+                player.Attributes.BroadcastChangedIfRevealed();
+
+                if (this.Attributes[GameAttribute.ItemStackQuantityLo] <= 1)
+                    player.Inventory.DestroyInventoryItem(this); // No more potions!
+                else
+                {
+                    this.Attributes[GameAttribute.ItemStackQuantityLo]--; // Just remove one
+                    this.Attributes.SendChangedMessage(player.InGameClient);
+                }
+            }
+            else if (this.ActorSNO.Id == 5656)
+            {
+                //LogNetClient LogNetClient = BnetClient;
+
+                Logger.Warn("Portal to New Tristram. Version 2.2.");
+                //Vector3D ToPortal = new Vector3D(2985.6241f, 2795.627f, 24.04532f);
+                try
+                {
+                    //Search Old Portals
+                    var OldOTG = player.World.GetActorsBySNO(5648);
+                    foreach (var OldP in OldOTG)
+                    {
+                        OldP.Destroy();
+                    }
+                }
+                catch { }
+
+                var ToHome = new Portal(player.World, 5648, player.World.Game.GetWorld(71150).StartingPoints[0].Tags);
+
+                ToHome.Scale = 0.9f;
+                Vector3D PositionToPortal = new Vector3D(player.Position.X, player.Position.Y + 3, player.Position.Z);
+                ToHome.EnterWorld(PositionToPortal);
+
+
+                if (this.Attributes[GameAttribute.ItemStackQuantityLo] <= 1)
+                    player.Inventory.DestroyInventoryItem(this);
+                else
+                {
+                    this.Attributes[GameAttribute.ItemStackQuantityLo]--;
+                    this.Attributes.SendChangedMessage(player.InGameClient);
+                }
+            }
+            else { throw new System.NotImplementedException(); }
+
+        
         }
 
         public override bool Reveal(Player player)

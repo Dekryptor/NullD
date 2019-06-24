@@ -25,7 +25,7 @@ namespace NullD.Core.GS.Items.Implementations
     [HandledType("Potion")]
     public class Potion : Item
     {
-        public Potion(Map.World world, ItemTable definition)
+        public Potion(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
             Attributes[GameAttribute.ItemStackQuantityLo] = 1;

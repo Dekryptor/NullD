@@ -33,7 +33,14 @@ namespace NullD.Core.GS.Powers.Implementations
     {
         public override IEnumerable<TickTimer> Main()
         {
-            WeaponDamage(GetBestMeleeEnemy(), 1.00f, DamageType.Physical);
+            if (User.ActorSNO.Id == 114917)//Дальность атаки для Diablo
+            {
+                WeaponDamage(GetBestMeleeEnemyWithRange(20f), 1.00f, DamageType.Physical);
+            }
+            else
+            {
+                WeaponDamage(GetBestMeleeEnemy(), 1.00f, DamageType.Physical);
+            }
             yield break;
         }
 

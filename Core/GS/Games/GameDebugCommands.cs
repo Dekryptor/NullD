@@ -153,8 +153,9 @@ namespace NullD.Core.GS.Games
                     if (!Int32.TryParse(@params[0], out worldId))
                         worldId = 71150;
 
-                    var game = GameManager.CreateGame(worldId); // hack-hack /raist.
-                    world = game.GetWorld(worldId);
+                    //var game = GameManager.CreateGame(worldId); // hack-hack /raist.
+                    //world = game.GetWorld(worldId);
+                    world = null;
                 }
 
                 if (world != null)

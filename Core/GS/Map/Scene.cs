@@ -363,11 +363,11 @@ namespace NullD.Core.GS.Map
                 specification.SNOCombatMusic = World.Environment.snoCombatMusic;
                 specification.SNOAmbient = World.Environment.snoAmbient;
                 specification.SNOReverb = World.Environment.snoReverb;
-                //specification.SNOWeather = World.Environment.snoWeather;
+                specification.SNOWeather = World.Environment.snoWeather;
                 //World data is being read from olders mpq patch files and reading the wrong
                 //weather.  forcing new weather from town to all scenes for now
                 //since it's much more pleasing on the eyes than the blue haze
-                specification.SNOWeather = 0x00013220;
+                //specification.SNOWeather = 0x00013220;
 
                 return new RevealSceneMessage
                 {
@@ -390,14 +390,76 @@ namespace NullD.Core.GS.Map
         {
             get
             {
-                return new MapRevealSceneMessage
+                if (
+                #region Город первого акта
+                    this.SceneSNO.Id == 1904 ||
+                    this.SceneSNO.Id == 33342 ||
+                    this.SceneSNO.Id == 33343 ||
+
+                    this.SceneSNO.Id == 33347 ||
+                    this.SceneSNO.Id == 33348 ||
+                    this.SceneSNO.Id == 33349
+                #endregion
+                    ||
+                #region Город второго акта
+                    this.SceneSNO.Id == 161516 ||
+                    this.SceneSNO.Id == 161510 ||
+                    this.SceneSNO.Id == 185542 ||
+
+                    this.SceneSNO.Id == 161507 ||
+                    this.SceneSNO.Id == 161513 ||
+                    this.SceneSNO.Id == 185545
+                #endregion
+                    ||
+                #region Город третьего акта
+                    this.SceneSNO.Id == 172892 ||
+                    this.SceneSNO.Id == 172880 ||
+                    this.SceneSNO.Id == 172868 ||
+
+                    this.SceneSNO.Id == 172888 ||
+                    this.SceneSNO.Id == 172876 ||
+                    this.SceneSNO.Id == 172863 ||
+
+                    this.SceneSNO.Id == 172884 ||
+                    this.SceneSNO.Id == 172872 ||
+                    this.SceneSNO.Id == 172908
+                #endregion
+                    ||
+                #region Город четвертого акта
+                    this.SceneSNO.Id == 183555 ||
+                    this.SceneSNO.Id == 183556 ||
+                    this.SceneSNO.Id == 183557 ||
+
+                    this.SceneSNO.Id == 183502 ||
+                    this.SceneSNO.Id == 183505 ||
+                    this.SceneSNO.Id == 183557 ||
+
+                    this.SceneSNO.Id == 183519 ||
+                    this.SceneSNO.Id == 183545 ||
+                    this.SceneSNO.Id == 183553
+                #endregion
+                    )
                 {
-                    ChunkID = this.DynamicID,
-                    SceneSNO = this.SceneSNO.Id,
-                    Transform = this.Transform,
-                    WorldID = this.World.DynamicID,
-                    MiniMapVisibility = false //= this.MiniMapVisibility
-                };
+                    return new MapRevealSceneMessage
+                    {
+                        ChunkID = this.DynamicID,
+                        SceneSNO = this.SceneSNO.Id,
+                        Transform = this.Transform,
+                        WorldID = this.World.DynamicID,
+                        MiniMapVisibility = true //= this.MiniMapVisibility
+                    };
+                }
+                else
+                {
+                    return new MapRevealSceneMessage
+                    {
+                        ChunkID = this.DynamicID,
+                        SceneSNO = this.SceneSNO.Id,
+                        Transform = this.Transform,
+                        WorldID = this.World.DynamicID,
+                        MiniMapVisibility = false //= this.MiniMapVisibility
+                    };
+                }
             }
         }
 

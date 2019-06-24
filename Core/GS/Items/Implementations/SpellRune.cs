@@ -35,7 +35,7 @@ namespace NullD.Core.GS.Items.Implementations
 
         public static readonly Logger Logger = LogManager.CreateLogger();
 
-        public SpellRune(World world, NullD.Common.MPQ.FileFormats.ItemTable definition)
+        public SpellRune(GS.Map.World world, NullD.Common.MPQ.FileFormats.ItemTable definition, bool Craft = false)
             : base(world, definition)
         {
             if (!definition.Name.Contains("X"))

@@ -105,6 +105,16 @@ namespace NullD.Core.LogNet.Services
                             .SetName("D3.Party.GameCreateParams")
                             .SetValue(bnet.protocol.attribute.Variant.CreateBuilder().SetMessageValue(gameCreateParams.ToByteString()).Build());
                         channelState.AddAttribute(attr);
+
+                        if (gameCreateParams.Coop.SnoQuest == 87700 && gameCreateParams.Coop.QuestStepId == -1)
+                        { channel.Owner.Account.CurrentGameAccount.CurrentToon.ActiveQuest = -1; channel.Owner.Account.CurrentGameAccount.CurrentToon.StepOfQuest = 0; }
+                        else
+                        {
+                            channel.Owner.Account.CurrentGameAccount.CurrentToon.ActiveQuest = gameCreateParams.Coop.SnoQuest;
+                            channel.Owner.Account.CurrentGameAccount.CurrentToon.StepIDofQuest = gameCreateParams.Coop.QuestStepId;
+                        }
+
+                        channel.Owner.Account.CurrentGameAccount.CurrentToon.ActiveAct = gameCreateParams.Coop.Act;
                         Logger.Trace("D3.Party.GameCreateParams: {0}", gameCreateParams.ToString());
                     }
                 }
@@ -138,7 +148,9 @@ namespace NullD.Core.LogNet.Services
                             .SetValue(bnet.protocol.attribute.Variant.CreateBuilder().SetMessageValue(oldScreen.ToByteString()));
                         channelState.AddAttribute(attr);
                         Logger.Trace("Client moving to Screen: {0}, with Status: {1}", oldScreen.Screen, oldScreen.Status);
+
                     }
+
                 }
                 else if (attribute.Name == "D3.Party.JoinPermissionPreviousToLock")
                 {
@@ -151,6 +163,26 @@ namespace NullD.Core.LogNet.Services
                         .SetValue(joinPermission);
                     channelState.AddAttribute(attr);
                     Logger.Trace("D3.Party.JoinPermissionPreviousToLock = {0}", joinPermission.IntValue);
+                }
+                else if (attribute.Name == "D3.Party.EnterGame.Members")
+                {
+                    var TestFormatOfMembers = D3.PartyMessage.EnterGamePartyMemberList.ParseFrom(attribute.Value.MessageValue);
+                    var attr = bnet.protocol.attribute.Attribute.CreateBuilder()
+                        .SetName("D3.Party.EnterGame.Members")
+                        .SetValue(bnet.protocol.attribute.Variant.CreateBuilder().SetMessageValue(TestFormatOfMembers.ToByteString()));
+                    //.SetValue(Members);
+                    channelState.AddAttribute(attr);
+                    Logger.Trace("D3.Party.EnterGame.Members = {0}", TestFormatOfMembers.MemberCount);
+                }
+                else if (attribute.Name == "D3.Party.JoinPermissionPreviousToClose")
+                {
+                    var Permission = attribute.Value;
+
+                    var attr = bnet.protocol.attribute.Attribute.CreateBuilder()
+                        .SetName("D3.Party.JoinPermissionPreviousToClose")
+                        .SetValue(Permission);
+                    channelState.AddAttribute(attr);
+                    Logger.Trace("D3.Party.JoinPermissionPreviousToClose = {0}", Permission.IntValue);
                 }
                 else if (attribute.Name == "D3.Party.LockReasons")
                 {

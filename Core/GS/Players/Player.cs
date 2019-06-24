@@ -57,6 +57,7 @@ using NullD.Core.GS.Ticker;
 using NullD.Net.GS.Message.Definitions.Encounter;
 using System.Threading.Tasks;
 using NullD.Net.GS.Message.Definitions.Inventory;
+using NullD.Common.Storage.AccountDataBase.Entities;
 
 namespace NullD.Core.GS.Players
 {
@@ -487,19 +488,44 @@ namespace NullD.Core.GS.Players
                                                    {DamageType.Poison, new[] {nonPhysDefault, nonPhysDefault}}
                                                };
 
+
             foreach (var damageType in DamageType.AllTypes)
             {
                 var weaponDamageMin = Math.Max(this.Inventory.GetItemBonus(GameAttribute.Damage_Weapon_Min, damageType.AttributeKey), damageAttributeMinValues[damageType][0]);
                 var weaponDamageDelta = Math.Max(this.Inventory.GetItemBonus(GameAttribute.Damage_Weapon_Delta, damageType.AttributeKey), damageAttributeMinValues[damageType][1]);
                 var weaponDamageBonusMin = this.Inventory.GetItemBonus(GameAttribute.Damage_Weapon_Bonus_Min, damageType.AttributeKey);
                 var weaponDamageBonusDelta = this.Inventory.GetItemBonus(GameAttribute.Damage_Weapon_Bonus_Delta, damageType.AttributeKey);
+                /*
+                var Equip = this.Inventory.GetEquippedItems();
+                foreach (var item in Equip)
+                {
+                    if (item.EquipmentSlot == (int)EquipmentSlotId.Main_Hand)
+                    {
+                        if (item.ItemDefinition.Name.ToLower().Contains("wand"))
+                        {
+                            this.Attributes[GameAttribute.Damage_Weapon_Min, damageType.AttributeKey] = weaponDamageMin;
+                            this.Attributes[GameAttribute.Damage_Weapon_Delta, damageType.AttributeKey] = weaponDamageDelta;
+                            this.Attributes[GameAttribute.Damage_Weapon_Bonus_Min, damageType.AttributeKey] = weaponDamageBonusMin;
+                            this.Attributes[GameAttribute.Damage_Weapon_Bonus_Delta, damageType.AttributeKey] = weaponDamageBonusDelta;
+                        }
+                    }
+                    else
+                    {
+                        this.Attributes[GameAttribute.Damage_Weapon_Min, damageType.AttributeKey] = weaponDamageMin;
+                        this.Attributes[GameAttribute.Damage_Weapon_Delta, damageType.AttributeKey] = weaponDamageDelta;
+                        this.Attributes[GameAttribute.Damage_Weapon_Bonus_Min, damageType.AttributeKey] = weaponDamageBonusMin;
+                        this.Attributes[GameAttribute.Damage_Weapon_Bonus_Delta, damageType.AttributeKey] = weaponDamageBonusDelta;
+                    }
 
+                }
+                */
                 this.Attributes[GameAttribute.Damage_Weapon_Min, damageType.AttributeKey] = weaponDamageMin;
                 this.Attributes[GameAttribute.Damage_Weapon_Delta, damageType.AttributeKey] = weaponDamageDelta;
                 this.Attributes[GameAttribute.Damage_Weapon_Bonus_Min, damageType.AttributeKey] = weaponDamageBonusMin;
                 this.Attributes[GameAttribute.Damage_Weapon_Bonus_Delta, damageType.AttributeKey] = weaponDamageBonusDelta;
-
                 this.Attributes[GameAttribute.Resistance, damageType.AttributeKey] = this.Inventory.GetItemBonus(GameAttribute.Resistance, damageType.AttributeKey);
+
+
             }
 
 
@@ -792,7 +818,9 @@ namespace NullD.Core.GS.Players
             else if (message is RequestBuffCancelMessage) OnRequestBuffCancel(client, (RequestBuffCancelMessage)message);
             else if (message is CancelChanneledSkillMessage) OnCancelChanneledSkill(client, (CancelChanneledSkillMessage)message);
             else if (message is TutorialShownMessage) OnTutorialShown(client, (TutorialShownMessage)message);
+            else if (message is LoopingAnimationPowerMessage) UseLooperPower(client, (LoopingAnimationPowerMessage)message);
             else if (message is BossEncounterAccept) BossPortal(client, (BossEncounterAccept)message);
+            else if (message is RequestSalvageMessage) OnSalvageItem(client, (RequestSalvageMessage)message);
             else return;
         }
 
@@ -2188,14 +2216,24 @@ namespace NullD.Core.GS.Players
             return new PlayerSavedData()
             {
                 HotBarButtons = this.SkillSet.HotBarSkills,
-                HotBarButton = new HotbarButtonData { SNOSkill = -1, Field1 = -1, ItemGBId = -1 },
+                HotBarButton = new HotbarButtonData { SNOSkill = -1, Field1 = -1, ItemGBId = this.Toon.Potion },
                 Field2 = 0xB4,
                 PlaytimeTotal = (int)this.Toon.TimePlayed,
                 WaypointFlags = 0x00000047,
 
                 Field4 = new HirelingSavedData()
                 {
-                    HirelingInfos = this.HirelingInfo,
+                    HirelingInfos = new HirelingInfo[4]
+                    {
+                        new HirelingInfo { HirelingIndex = 0x00000000, Field1 = -1, Level = 0, Field3 = 0x0000, Field4 = false, Skill1SNOId = -1, Skill2SNOId = -1, Skill3SNOId = -1, Skill4SNOId = -1, },
+                        
+                        //Страж
+                        new HirelingInfo { HirelingIndex = 0x00000000, Field1 = -1, Level = Toon.LevelOfTemplar, Field3 = 0x0000, Field4 = false, Skill1SNOId = Toon.Templar_Skill1, Skill2SNOId = Toon.Templar_Skill2, Skill3SNOId = Toon.Templar_Skill3, Skill4SNOId = Toon.Templar_Skill4, },
+                        //Негодяй
+                        new HirelingInfo { HirelingIndex = 0x00000000, Field1 = -1, Level = Toon.LevelOfScoundrel, Field3 = 0x0000, Field4 = false, Skill1SNOId = Toon.Scoundrel_Skill1, Skill2SNOId = Toon.Scoundrel_Skill2, Skill3SNOId = Toon.Scoundrel_Skill3, Skill4SNOId = Toon.Scoundrel_Skill4, },
+                        //Заклинательница
+                        new HirelingInfo { HirelingIndex = 0x00000000, Field1 = -1, Level = Toon.LevelOfEnchantress, Field3 = 0x0000, Field4 = false, Skill1SNOId = Toon.Enchantress_Skill1, Skill2SNOId = Toon.Enchantress_Skill2, Skill3SNOId = Toon.Enchantress_Skill3, Skill4SNOId = Toon.Enchantress_Skill4, },
+                    },
                     Field1 = 0x00000000,
                     Field2 = 0x00000002,
                 },
@@ -2301,28 +2339,39 @@ namespace NullD.Core.GS.Players
             return new PlayerBannerMessage() { PlayerBanner = playerBanner };
         }
 
-        public BlacksmithDataInitialMessage GetBlacksmithData()
+        public BlacksmithDataInitialMessage GetBlacksmithData(DBArtisansOfToon Artisans)
         {
             var blacksmith = D3.ItemCrafting.CrafterData.CreateBuilder()
-                .SetLevel(45)
+                .SetLevel(Artisans.Blacksmith)
+                //1 - 1 level and 0 exp. 46 - max level. 5 Step for every level - AiDiE
                 .SetCooldownEnd(0)
                 .Build();
             return new BlacksmithDataInitialMessage() { CrafterData = blacksmith };
         }
 
-        public JewelerDataInitialMessage GetJewelerData()
+        public BlacksmithDataInitialMessage GetBlacksmithDataFixInt(int Numb)
+        {
+            var blacksmith = D3.ItemCrafting.CrafterData.CreateBuilder()
+                .SetLevel(Numb)
+                //1 - 1 level and 0 exp. 46 - max level. 5 Step for every level - AiDiE
+                .SetCooldownEnd(0)
+                .Build();
+            return new BlacksmithDataInitialMessage() { CrafterData = blacksmith };
+        }
+
+        public JewelerDataInitialMessage GetJewelerData(DBArtisansOfToon Artisans)
         {
             var jeweler = D3.ItemCrafting.CrafterData.CreateBuilder()
-                .SetLevel(9)
+                .SetLevel(Artisans.Jeweler)
                 .SetCooldownEnd(0)
                 .Build();
             return new JewelerDataInitialMessage() { CrafterData = jeweler };
         }
 
-        public MysticDataInitialMessage GetMysticData()
+        public MysticDataInitialMessage GetMysticData(DBArtisansOfToon Artisans)
         {
             var mystic = D3.ItemCrafting.CrafterData.CreateBuilder()
-                .SetLevel(45)
+                .SetLevel(1)
                 .SetCooldownEnd(0)
                 .Build();
             return new MysticDataInitialMessage() { CrafterData = mystic };

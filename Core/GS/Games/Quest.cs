@@ -65,7 +65,7 @@ namespace NullD.Core.GS.Games
 
                 public QuestObjective(NullD.Common.MPQ.FileFormats.QuestStepObjective objective, QuestStep questStep, int id)
                 {
-                    Logger.Debug(" (QuestObjective ctor) creating an objective with ID {0}, QuestStepObjective {1} and QuestStep ID {2}", id, objective.Group1Name, questStep.QuestStepID);
+                    //Logger.Debug(" (QuestObjective ctor) creating an objective with ID {0}, QuestStepObjective {1} and QuestStep ID {2}", id, objective.Group1Name, questStep.QuestStepID);
                     ID = id;
                     this.objective = objective;
                     this.questStep = questStep;
@@ -76,8 +76,8 @@ namespace NullD.Core.GS.Games
                 /// </summary>
                 public void NotifyBonus(NullD.Common.MPQ.FileFormats.QuestStepObjectiveType type, int value)
                 {
-                    Logger.Debug(" (NotifyBonus) objective details SNOName 1 : {0}, ID {1} \n SNOName 2  : {2},ID {3} ", objective.SNOName1.Name, objective.SNOName1.Id, objective.SNOName2.Name, objective.SNOName2.Id);
-                    Logger.Debug(" (NotifyBonus) in QuestObjective for type {0} and value {1} and objective.ObjectiveType is {2}", type, value, objective.ObjectiveType);
+                    //Logger.Debug(" (NotifyBonus) objective details SNOName 1 : {0}, ID {1} \n SNOName 2  : {2},ID {3} ", objective.SNOName1.Name, objective.SNOName1.Id, objective.SNOName2.Name, objective.SNOName2.Id);
+                    //Logger.Debug(" (NotifyBonus) in QuestObjective for type {0} and value {1} and objective.ObjectiveType is {2}", type, value, objective.ObjectiveType);
                     //if (type != objective.ObjectiveType) return;
                     switch (type)
                     {
@@ -91,6 +91,11 @@ namespace NullD.Core.GS.Games
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterWorld:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterScene:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.InteractWithActor:
+                            {
+                                Counter++;
+                                questStep.UpdateBonusCounter(this);
+                            }
+                            break;
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.KillMonster:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.CompleteQuest:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.HadConversation:
@@ -118,6 +123,27 @@ namespace NullD.Core.GS.Games
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterWorld:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterScene:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.InteractWithActor:
+                            {
+                                if (value == objective.SNOName1.Id)
+                                {
+                                    //Logger.Debug(" %%%%%%% AN EVENT OCCURED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ");
+                                    Logger.Debug(" (Notify) objective SNOName1  Name : {0}, Id {1}, Valid {2} ", objective.SNOName1.Name, objective.SNOName1.Id, objective.SNOName1.IsValid);
+                                    Logger.Debug(" (Notify) objective SNOName2  Name : {0}, Id {1}, Valid {2} ", objective.SNOName2.Name, objective.SNOName2.Id, objective.SNOName2.IsValid);
+                                    Logger.Debug(" (Notify) objective Group1Name : {0} ", objective.Group1Name);
+                                    //Logger.Debug(" (Notify) objective I0 : {0} ", objective.I0);
+                                    //Logger.Debug(" (Notify) objective I2 : {0} ", objective.I2);
+                                    //Logger.Debug(" (Notify) objective I4 : {0} ", objective.I4);
+                                    //Logger.Debug(" (Notify) objective I5 : {0} ", objective.I5);
+                                    Logger.Debug(" -> (Notify) objectiveType : {0} ", objective.ObjectiveType);
+                                    Logger.Debug(" (Notify) objective GBID1 : {0} ", objective.GBID1);
+                                    Logger.Debug(" (Notify) objective GBID2 : {0} ", objective.GBID2);
+                                    //Logger.Debug(" (Notify) NOW CALLING UPDATE COUNTER ");
+
+                                    Counter++;
+                                    questStep.UpdateCounter(this);
+                                }
+                                break;
+                            }
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.KillMonster:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.CompleteQuest:
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.HadConversation:
@@ -150,7 +176,11 @@ namespace NullD.Core.GS.Games
                                 break;
                             }
                         case NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.TimedEventExpired:
-                            throw new NotImplementedException();
+                            {
+                                Counter++;
+                                questStep.UpdateCounter(this);
+                                break;
+                            }
                     }
                 }
             }
@@ -243,11 +273,24 @@ namespace NullD.Core.GS.Games
 
                 foreach (var objectiveSet in assetQuestStep.StepObjectiveSets)
                 {
-                    ObjectivesSets.Add(new ObjectiveSet()
+                    if (objectiveSet.FollowUpStepID == -2)
                     {
-                        FollowUpStepID = objectiveSet.FollowUpStepID,
-                        Objectives = new List<QuestObjective>(from objective in objectiveSet.StepObjectives select new QuestObjective(objective, this, c++))
-                    });
+                        ObjectivesSets.Add(new ObjectiveSet()
+                        {
+
+                            FollowUpStepID = 36,
+                            Objectives = new List<QuestObjective>(from objective in objectiveSet.StepObjectives select new QuestObjective(objective, this, c++))
+                        });
+                    }
+                    else
+                    {
+                        ObjectivesSets.Add(new ObjectiveSet()
+                        {
+
+                            FollowUpStepID = objectiveSet.FollowUpStepID,
+                            Objectives = new List<QuestObjective>(from objective in objectiveSet.StepObjectives select new QuestObjective(objective, this, c++))
+                        });
+                    }
                 }
                 c = 0;
 
@@ -471,17 +514,16 @@ namespace NullD.Core.GS.Games
             {
                 Logger.Debug(" (StepCompleted) All objective have been reached Quest is Done ");
                 CurrentStep = null;
-                // somehow we should remove something from somehting else
+                CurrentStep = (from step in asset.QuestSteps where step.ID == FollowUpStepID select new QuestStep(step, this)).FirstOrDefault();
             }
             else
             {
                 if (QuestCompletionSteps.Exists(qc => qc.StepId == FollowUpStepID))
                 {
                     Logger.Debug(" (StepCompleted) addin the EndingQuestStep ");
-                    CurrentStep = null;
+                    CurrentStep = new QuestStep(asset.QuestUnassignedStep, this);
                     completedSteps.Add(FollowUpStepID);
                     Logger.Debug(" (StepCompleted) shooting the event handler");
-                    OnQuestProgress -= OnQuestProgress;
                 }
                 else
                 {
@@ -490,18 +532,6 @@ namespace NullD.Core.GS.Games
                 }
             }
 
-
-            //Logger.Debug(" (StepCompleted) Choosing new current step");
-
-            //if (CurrentStep == null)
-            //{
-            //    Logger.Debug(" (StepCompleted) No more step :p quest DONE !! ");
-            //}
-            //else
-            //{
-            //    Logger.Debug(" (StepCompleted) current step is {0}", CurrentStep.QuestStepID);
-
-            //}
         }
 
         public void NotifyBonus(NullD.Common.MPQ.FileFormats.QuestStepObjectiveType type, int value)

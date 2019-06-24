@@ -58,7 +58,8 @@ namespace NullD.Core.GS.Actors.Movement
             // mobs sometimes skip a bit, pretty sure this is because timing isnt correct.  :( - DarkLotus
 
 
-            this.Timer = new SteppedRelativeTickTimer(this.Owner.World.Game, 18, (int)(_path.Count * 2 / this.Owner.WalkSpeed),
+            //this.Timer = new SteppedRelativeTickTimer(this.Owner.World.Game, 18, (int)(_path.Count * 2 / this.Owner.WalkSpeed),
+            this.Timer = new SteppedRelativeTickTimer(this.Owner.World.Game, 6, (int)(_path.Count * 2 / this.Owner.WalkSpeed),
             (tick) =>
             {
                 //this.Owner.Position = MovementHelpers.GetMovementPosition(this.Owner.Position, this.Owner.WalkSpeed, facingAngle, 6);

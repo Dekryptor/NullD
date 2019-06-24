@@ -23,6 +23,7 @@ using NullD.Common.Logging;
 using NullD.Core.GS.Players;
 using NullD.Core.LogNet.Toons;
 using NullD.Net.GS.Message;
+using NullD.Net.LogNet;
 
 namespace NullD.Core.GS.Games
 {
@@ -31,12 +32,12 @@ namespace NullD.Core.GS.Games
         private static readonly Logger Logger = LogManager.CreateLogger();
         private static readonly Dictionary<int, Game> Games = new Dictionary<int, Game>();
 
-        public static Game CreateGame(int gameId)
+        public static Game CreateGame(int gameId, List<LogNetClient> clients)
         {
             if (Games.ContainsKey(gameId))
                 return Games[gameId];
 
-            var game = new Game(gameId);
+            var game = new Game(gameId, clients);
             Games.Add(gameId, game);
             return game;
         }

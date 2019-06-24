@@ -65,7 +65,14 @@ namespace NullD.Core.GS.Games
         public void NotifyQuest(int snoQuest, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType type, int value)
         {
             Logger.Debug(" (NotifyQuest) through QuestManager for quest {2}, type {0} and value {1} ", type, value, snoQuest);
-            Quests[snoQuest].Notify(type, value);
+            try
+            {
+                Quests[snoQuest].Notify(type, value);
+            }
+            catch
+            {
+                Logger.Error("Ошибка обработки оповещения системы квестов.");
+            }
         }
 
         ///// <summary>

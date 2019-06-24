@@ -248,13 +248,31 @@ namespace NullD.Core.GS.Players
             });
 
             //TODO: Handle each conversation type
-            if (this.asset.ConversationType == ConversationTypes.QuestEvent)
+            if (this.asset.ConversationType == ConversationTypes.QuestEvent || this.asset.ConversationType == ConversationTypes.QuestFloat)
             {
                 logger.Debug("Handling conversation type QuestEvent for Conversation: {0}", this.SNOId);
-                if (this.manager.QuestEventDict.ContainsKey((uint)this.SNOId))
+                if (SNOId == 107080)
+                {
+                    //this.player.World.Game.Quests.NotifyQuest(107098, QuestStepObjectiveType.HadConversation, 107080);
+                    this.manager.QuestEventDict[(uint)107080].Execute(this.player.World);
+                }
+                else if (this.manager.QuestEventDict.ContainsKey((uint)this.SNOId))
                 {
                     logger.Info(" (EndConversation) Start cov");
                     this.manager.QuestEventDict[(uint)this.SNOId].Execute(this.player.World); // launch a questEvent
+                }
+                else
+                {
+                    logger.Debug("  (EndConversation) Conversation number {0} is linked to a Quest Event or Quest Float or Quest Standard, it should be implemented ", this.SNOId);
+                }
+            }
+            else if (this.SNOId == 167115 || this.SNOId == 72817 || this.SNOId == 133372 || this.SNOId == 198925 || this.SNOId == 194942)  // КАААААААААСТЫЛИ
+            {
+                logger.Debug("Запуск диалога: {0}", this.SNOId);
+                if (this.manager.QuestEventDict.ContainsKey((uint)this.SNOId))
+                {
+                    logger.Info("(Диалог) Запуск скрипта");
+                    this.manager.QuestEventDict[(uint)this.SNOId].Execute(this.player.World); // Запуск квеста
                 }
                 else
                 {
@@ -264,7 +282,6 @@ namespace NullD.Core.GS.Players
             else
             {
                 logger.Debug("  (EndConversation) Conversation type {0} for Conversation: {1} not implemented", this.asset.ConversationType, this.SNOId);
-
             }
 
             if (ConversationEnded != null)
@@ -376,16 +393,20 @@ namespace NullD.Core.GS.Players
             // this is were we store the active quests when they are implemented 
             // warning the number here should match that of conversation which ARE considered as QuestEvent from the asset db
 
-            // protector of tristam 87700
-            this.QuestEventDict.Add(151087, new SurviveTheWaves());
-            this.QuestEventDict.Add(151123, new LeahInn());
-            this.QuestEventDict.Add(151167, new LeahInnAfterKilling());
-            this.QuestEventDict.Add(198503, new _198503()); // erekose
-            this.QuestEventDict.Add(198521, new _198521()); // erekose
-
-            // rescue Cain 72095
-            this.QuestEventDict.Add(198541, new _198541()); // erekose
-            this.QuestEventDict.Add(198617, new _198617()); // erekose
+            // Fallen Star 87700
+            this.QuestEventDict.Add(151087, new SurviveTheWaves()); //Defend of New Tristram
+            this.QuestEventDict.Add(151123, new LeahInn()); // Inn and Killing Zombie
+            this.QuestEventDict.Add(151167, new LeahInnAfterKilling()); //Talking With Leah
+            this.QuestEventDict.Add(198503, new _198503()); // Killing WM and QWM + Teleport  
+            this.QuestEventDict.Add(198521, new _198521()); // Teleport and End.
+            // Rescue Cain 72095
+            this.QuestEventDict.Add(198541, new _198541()); // Start Quest
+            this.QuestEventDict.Add(190404, new _190404()); // Диалог перед телепортацией
+            this.QuestEventDict.Add(166678, new _166678()); // Открытие ворот
+            this.QuestEventDict.Add(167115, new _167115()); // Призыв и убийство капитана Далтина
+            this.QuestEventDict.Add(198588, new _198588()); // Разговор с Леей под домом после убийства
+            this.QuestEventDict.Add(17667, new _17667());   // Разговор с Каином после спасения
+            this.QuestEventDict.Add(198617, new _198617()); // Завершение квеста
 
             // skeleton king 72061
             this.QuestEventDict.Add(154570, new _154570());

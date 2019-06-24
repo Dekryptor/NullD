@@ -27,27 +27,82 @@ using NullD.Net.GS.Message.Definitions.Map;
 using NullD.Net.GS.Message.Definitions.Misc;
 using NullD.Net.GS.Message.Fields;
 using NullD.Core.GS.Common.Types.TagMap;
+using NullD.Core.GS.Common.Types.Math;
 
 namespace NullD.Core.GS.Actors.Implementations
 {
     public sealed class Waypoint : Gizmo
     {
         public int WaypointId { get; private set; }
+        public int LastI;
 
         public Waypoint(World world, int snoId, TagMap tags)
             : base(world, snoId, tags)
         {
+
+            /*
+                [072689] [Actor] MinimapIconStairs_Switch
+                [075172] [Actor] minimapMarker_model
+                [004686] [Actor] MinimapIconStairs
+                [075171] [Appearance] minimapMarker_model
+                [212733] [MarkerSet] caOut_Boneyard_ExitA_E02_S02 (Minimap Pings)
+
+             */
+
+            var FalseActorToIcons = World.GetActorsBySNO(4686);
+            foreach (var one in FalseActorToIcons)
+            {
+                one.Attributes[GameAttribute.MinimapIconOverride] = 0x1FA21;
+                one.Attributes[GameAttribute.MinimapActive] = true;
+                one.Attributes.BroadcastChangedIfRevealed();
+            }
+            this.Attributes[GameAttribute.MinimapIconOverride] = 0x1FA21;
             this.Attributes[GameAttribute.MinimapActive] = true;
+
         }
 
         public override void OnEnter(World world)
         {
-            this.ReadWaypointId();
+            this.ReadWaypointId(world);
         }
 
-        private void ReadWaypointId()
+        private void ReadWaypointId(World world)
         {
             var actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70015].Data;
+            #region Проверка при старте
+
+            if (world.WorldSNO.Id == 71150)
+                actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70015].Data;
+            if (world.WorldSNO.Id == 161472)
+                actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70016].Data;
+            if (world.WorldSNO.Id == 172909)
+                actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70017].Data;
+            if (world.WorldSNO.Id == 178152)
+                actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70018].Data;
+            #endregion
+
+            #region Внутри игры
+            foreach (var player in world.Game.Players.Values)
+            {
+                
+                if (player.Toon.ActiveAct == 0)
+                {
+                    actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70015].Data;
+                }
+                else if (player.Toon.ActiveAct == 100)
+                {
+                    actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70016].Data;
+                }
+                else if (player.Toon.ActiveAct == 200)
+                {
+                    actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70017].Data;
+                }
+                else if (player.Toon.ActiveAct == 300)
+                {
+                    actData = (NullD.Common.MPQ.FileFormats.Act)MPQStorage.Data.Assets[SNOGroup.Act][70018].Data;
+                }
+            }
+            #endregion
             var wayPointInfo = actData.WayPointInfo;
 
             var proximity = new Rect(this.Position.X - 1.0, this.Position.Y - 1.0, 2.0, 2.0);
@@ -64,6 +119,9 @@ namespace NullD.Core.GS.Actors.Implementations
 
             for (int i = 0; i < wayPointInfo.Length; i++)
             {
+                // World - Level
+                //117405 - 117411
+                //167721 - 119870
                 if (wayPointInfo[i].SNOLevelArea == -1)
                     continue;
 
@@ -77,11 +135,14 @@ namespace NullD.Core.GS.Actors.Implementations
                     break;
                 }
             }
+
         }
 
         public override void OnTargeted(Player player, Net.GS.Message.Definitions.World.TargetMessage message)
         {
             var world = player.World;
+            //194401
+
 
             world.BroadcastIfRevealed(new PlayAnimationMessage()
             {
@@ -99,6 +160,8 @@ namespace NullD.Core.GS.Actors.Implementations
                         }
                     }
             }, this);
+
+            this.PlayActionAnimation(194401);
 
             player.InGameClient.SendMessage(new ANNDataMessage(Opcodes.OpenWaypointSelectionWindowMessage)
             {
@@ -122,7 +185,7 @@ namespace NullD.Core.GS.Actors.Implementations
                     Position = this.Position,
                     WorldID = this.World.DynamicID
                 },
-                Field2 = 0x1FA21,
+                Field2 = 0x1FA21, // 129569 // Healer - 230136 0x382F8
                 m_snoStringList = 0xF063,
 
                 Field3 = unchecked((int)0x9799F57B),
@@ -135,6 +198,20 @@ namespace NullD.Core.GS.Actors.Implementations
                 Field8 = false,
                 Field12 = 0
             });
+
+            this.World.SpawnMonster(4686, new Vector3D(Position.X, Position.Y, Position.Z - 1));
+            //uint Need = World.NewActorID - 2;
+
+            var actors = this.GetActorsInRange(1f);
+            foreach (var actor in actors)
+            {
+                if (actor.ActorSNO.Id == 4686)
+                {
+                    actor.Attributes[GameAttribute.MinimapIconOverride] = 0x1FA21;
+                    actor.Attributes[GameAttribute.MinimapActive] = true;
+                    actor.Attributes.BroadcastChangedIfRevealed();
+                }
+            }
 
             return true;
         }
