@@ -79,8 +79,8 @@ namespace NullD
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler; // Watch for any unhandled exceptions.
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture; // Use invariant culture - we have to set it explicitly for every thread we create to prevent any mpq-reading problems (mostly because of number formats).
 
-            string Revision = "2"; // Ревизия
-            string date = "24/06/2019";
+            string Revision = "3"; // Ревизия
+            string date = "25/06/2019";
 
             string title = "NullD - Revision [" + Revision + "] - Date [" + date + "] - By AiDiE";
 
