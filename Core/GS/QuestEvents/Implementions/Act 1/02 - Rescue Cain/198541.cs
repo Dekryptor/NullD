@@ -75,7 +75,7 @@ namespace NullD.Core.GS.QuestEvents.Implementations
 
             #region Создаем Лею как подругу.
             Hireling LeahFriend = new LeahParty(world, LeahBrains.ActorSNO.Id, LeahBrains.Tags);
-            //LeahFriend.Brain = new HirelingBrain(LeahFriend);
+            LeahFriend.Brain = new HirelingBrain(LeahFriend);
             foreach (var player in world.Players)
             {
                 if (player.Value.PlayerIndex == 0)

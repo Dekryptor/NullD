@@ -44,6 +44,7 @@ namespace NullD.Core.GS.Actors
 
         private ResolvedPortalDestination Destination { get; set; }
         private int MinimapIcon;
+        public ulong PlayerBackPortalID = 0xFFFFFFFFFFFF;
 
         public Portal(World world, int snoId, TagMap tags)
             : base(world, snoId, tags)
@@ -437,9 +438,42 @@ namespace NullD.Core.GS.Actors
         public override void OnTargeted(Player player, TargetMessage message)
         {
             Logger.Debug("(OnTargeted) Portal has been activated ");
-
             var world = this.World.Game.GetWorld(this.Destination.WorldSNO);
+            var startingPoint = world.GetStartingPointById(this.Destination.StartingPointActorTag);
 
+            #region События
+            //Подвал Адрии
+            if (this.Destination.WorldSNO == 62751)
+            {
+                //Enter в Adrian's Hut
+                bool QuestEnter = false;
+                var Cauldron = world.GetActorBySNO(131123);
+                if (player.PlayerIndex == 0)
+                {
+                    if (player.Toon.ActiveQuest == 72095)
+                    {
+                        player.Toon.ActiveQuest = 72095;
+                        if (player.Toon.StepOfQuest == 5)
+                        {
+                            player.Toon.StepOfQuest = 6;
+                            player.Toon.StepIDofQuest = 51;
+                            QuestEnter = true;
+                        }
+                        var Leah_Cellar = world.GetActorBySNO(203030);
+                        Leah_Cellar.Position = new Vector3D(-200f, -200f, 3.051758E-05f);
+                    }
+                }
+                if (QuestEnter == true)
+                {
+                    world.Game.Quests.NotifyQuest(72095, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EventReceived, -1);
+                    //world.Game.Quests.Advance(72095);
+                }
+            }
+            #endregion
+
+            #region Авто-Учёт перехода для Квест-Менеджера
+            world.Game.Quests.NotifyQuest(player.Toon.ActiveQuest, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.EnterWorld, this.Destination.WorldSNO);
+            #endregion
             if (world == null)
             {
                 Logger.Warn("Portal's destination world does not exist (WorldSNO = {0})", this.Destination.WorldSNO);
@@ -463,6 +497,9 @@ namespace NullD.Core.GS.Actors
                 dbPortalOfToon.X = this.Position.X;
                 dbPortalOfToon.Y = this.Position.Y;
                 dbPortalOfToon.Z = this.Position.Z;
+                dbPortalOfToon.PlayerIndex = player.PlayerIndex;
+
+
                 DBSessions.AccountSession.SaveOrUpdate(dbPortalOfToon);
 
                 Logger.Warn("Data for back portal Saved.");
@@ -477,6 +514,7 @@ namespace NullD.Core.GS.Actors
                     }
 
                     var ToHome = new Portal(player.World.Game.GetWorld(71150), 5648, player.World.Game.GetWorld(71150).StartingPoints[0].Tags);
+
                     ToHome.Destination = new ResolvedPortalDestination
                     {
                         WorldSNO = dbPortalOfToon.WorldDest,
@@ -484,6 +522,8 @@ namespace NullD.Core.GS.Actors
                         StartingPointActorTag = -101
                     };
                     ToHome.EnterWorld(ToPortal);
+                    if (PlayerBackPortalID == 0xFFFFFFFFFFFF)
+                        ToHome.PlayerBackPortalID = player.Toon.PersistentID;
 
                     if (player.World.Game.GetWorld(71150) != player.World)
                     {
@@ -513,7 +553,7 @@ namespace NullD.Core.GS.Actors
                                 Field3 = 0,
                             });
                         }
-                        
+
                     }
                     else
                     {
@@ -542,7 +582,8 @@ namespace NullD.Core.GS.Actors
                     };
 
                     ToHome.EnterWorld(ToPortal2Act);
-
+                    if (PlayerBackPortalID == 0xFFFFFFFFFFFF)
+                        ToHome.PlayerBackPortalID = player.Toon.PersistentID;
                     if (player.World.Game.GetWorld(161472) != player.World)
                     {
                         player.ChangeWorld(player.World.Game.GetWorld(161472), ToPortal2Act);
@@ -576,7 +617,8 @@ namespace NullD.Core.GS.Actors
                         StartingPointActorTag = -101
                     };
                     ToHome.EnterWorld(ToPortal3Act);
-
+                    if (PlayerBackPortalID == 0xFFFFFFFFFFFF)
+                        ToHome.PlayerBackPortalID = player.Toon.PersistentID;
                     if (player.World.Game.GetWorld(172909) != player.World)
                         player.ChangeWorld(player.World.Game.GetWorld(172909), ToPortal3Act);
                     else
@@ -599,7 +641,8 @@ namespace NullD.Core.GS.Actors
                         StartingPointActorTag = -101
                     };
                     ToHome.EnterWorld(ToPortal4Act);
-
+                    if (PlayerBackPortalID == 0xFFFFFFFFFFFF)
+                        ToHome.PlayerBackPortalID = player.Toon.PersistentID;
                     if (player.World.Game.GetWorld(178152) != player.World)
                         player.ChangeWorld(player.World.Game.GetWorld(178152), ToPortal4Act);
                     else
@@ -611,7 +654,14 @@ namespace NullD.Core.GS.Actors
             //Портал из Города
             else if (this.Destination.StartingPointActorTag == -101)
             {
-                var dbPortalOfToon = DBSessions.AccountSession.Get<DBPortalOfToon>(player.Toon.PersistentID);
+                if (PlayerBackPortalID == player.Toon.PersistentID)
+                {
+                    this.Destroy();
+                }
+
+                var dbPortalOfToon = DBSessions.AccountSession.Get<DBPortalOfToon>(PlayerBackPortalID);
+
+
                 Vector3D ToPortal = new Vector3D(dbPortalOfToon.X, dbPortalOfToon.Y, dbPortalOfToon.Z);
                 var DestWorld = player.World.Game.GetWorld(dbPortalOfToon.WorldDest);
                 var oldPortals = DestWorld.GetActorsBySNO(5648);
@@ -651,35 +701,40 @@ namespace NullD.Core.GS.Actors
                         });
                     }
                 }
+
+
             }
-            #endregion
-
-            var startingPoint = world.GetStartingPointById(this.Destination.StartingPointActorTag);
-
-            if (startingPoint != null)
-                player.ChangeWorld(world, startingPoint);
             else
             {
-                #region Использование умного телепорта
-                if (this.Destination.StartingPointActorTag != 0)
-                {
-                    StartingPoint NeededStartingPoint = world.GetStartingPointById(this.Destination.StartingPointActorTag);
-                    var DestWorld = world.Game.GetWorld(this.Destination.WorldSNO);
-                    var StartingPoints = DestWorld.GetActorsBySNO(5502);
-                    foreach (var ST in StartingPoints)
-                    {
-                        if (ST.CurrentScene.SceneSNO.Id == this.Destination.StartingPointActorTag)
-                            NeededStartingPoint = (ST as StartingPoint);
-                    }
-                    player.ChangeWorld(DestWorld, NeededStartingPoint);
-                }
+
                 #endregion
+
+
+                if (startingPoint != null)
+                    player.ChangeWorld(world, startingPoint);
                 else
                 {
-                    Logger.Warn("Portal's tagged starting point does not exist (Tag = {0})", this.Destination.StartingPointActorTag);
+                    #region Использование умного телепорта
+                    if (this.Destination.StartingPointActorTag != 0)
+                    {
+                        StartingPoint NeededStartingPoint = world.GetStartingPointById(this.Destination.StartingPointActorTag);
+                        var DestWorld = world.Game.GetWorld(this.Destination.WorldSNO);
+                        var StartingPoints = DestWorld.GetActorsBySNO(5502);
+                        foreach (var ST in StartingPoints)
+                        {
+                            if (ST.CurrentScene.SceneSNO.Id == this.Destination.StartingPointActorTag)
+                                NeededStartingPoint = (ST as StartingPoint);
+                        }
+                        player.ChangeWorld(DestWorld, NeededStartingPoint);
+                    }
+                    #endregion
+                    else
+                    {
+                        Logger.Warn("Portal's tagged starting point does not exist (Tag = {0})", this.Destination.StartingPointActorTag);
+                    }
                 }
+
             }
-                
         }
     }
 }

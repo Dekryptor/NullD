@@ -57,8 +57,12 @@ namespace NullD.Core.GS.Actors
             Conversations = new List<ConversationInteraction>();
             Field7 = 1;
             foreach (var quest in World.Game.Quests)
-                quest.OnQuestProgress += new Games.Quest.QuestProgressDelegate(quest_OnQuestProgress);
-            UpdateConversationList(); // show conversations with no quest dependency
+                if (this.ActorSNO.Id != 203030 || //Лея в подвале
+                this.ActorSNO.Id != -1)
+                    quest.OnQuestProgress += new Games.Quest.QuestProgressDelegate(quest_OnQuestProgress);
+            if (this.ActorSNO.Id != 203030 || //Лея в подвале
+                this.ActorSNO.Id != -1)
+                UpdateConversationList(); // show conversations with no quest dependency
         }
 
         protected override void quest_OnQuestProgress(Quest quest) // shadows Actors'NullD.Core.GS.Actors.InteractiveNPC.quest_OnQuestProgress(NullD.Core.GS.Games.Quest)'
@@ -206,26 +210,37 @@ namespace NullD.Core.GS.Actors
         private void UpdateConversationList()
         {
             // Logger.Debug(" (UpdateConversationList) has been called ");
+            bool HaveUnReaded = false;
+
             if (ConversationList != null) // this is from Actor
             {
                 var ConversationsNew = new List<int>();
                 foreach (var entry in ConversationList.ConversationListEntries) // again on actor
                 {
-                    if (entry.SNOConv == 198541)
-                    {
-                        Logger.Debug(" (UpdateConversationList) conv 198541 found for Actor {0} dyn actor {1}", ActorSNO, DynamicID);
-                        Logger.Debug(" (UpdateConversationList) conv 198541 entry quest complete is {0}", entry.SNOQuestComplete);
-                    }
-
                     if (entry.SNOLevelArea == -1 && entry.SNOQuestActive == -1 && entry.SNOQuestAssigned == -1 && entry.SNOQuestComplete == -1 && entry.SNOQuestCurrent == -1 && entry.SNOQuestRange == -1)
                         ConversationsNew.Add(entry.SNOConv);
-
                     if (NullD.Common.MPQ.MPQStorage.Data.Assets[Common.Types.SNO.SNOGroup.QuestRange].ContainsKey(entry.SNOQuestRange))
-                        if (World.Game.Quests.IsInQuestRange(NullD.Common.MPQ.MPQStorage.Data.Assets[Common.Types.SNO.SNOGroup.QuestRange][entry.SNOQuestRange].Data as NullD.Common.MPQ.FileFormats.QuestRange))
-                            ConversationsNew.Add(entry.SNOConv);
+                    {
+                        try
+                        {
+                            if (World.Game.Quests.IsInQuestRange(NullD.Common.MPQ.MPQStorage.Data.Assets[Common.Types.SNO.SNOGroup.QuestRange][entry.SNOQuestRange].Data as NullD.Common.MPQ.FileFormats.QuestRange))
+                                ConversationsNew.Add(entry.SNOConv);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
 
-                    if (World.Game.Quests.HasCurrentQuest(entry.SNOQuestCurrent, entry.I3))
-                        ConversationsNew.Add(entry.SNOConv);
+                    try
+                    {
+                        if (World.Game.Quests.HasCurrentQuest(entry.SNOQuestCurrent, entry.I3))
+                            ConversationsNew.Add(entry.SNOConv);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
 
                 // remove outdates conversation options and add new ones
@@ -245,9 +260,29 @@ namespace NullD.Core.GS.Actors
                                 questConversation = true;
                             }
 
+
                 // show the exclamation mark if actor has an unread quest conversation
                 Attributes[GameAttribute.Conversation_Icon, 0] = questConversation ? 1 : 0;
+
+                if (Conversations.Count > 0 & Attributes[GameAttribute.Conversation_Icon, 0] != 1 & !(this is Vendor) & !(this is Healer))
+                {
+                    foreach (var conv in this.Conversations)
+                    {
+                        if (!conv.Read)
+                        {
+                            Attributes[GameAttribute.Conversation_Icon, 0] = 3;
+                            HaveUnReaded = true;
+                        }
+                    }
+                    if (!HaveUnReaded)
+                    {
+                        Attributes[GameAttribute.Conversation_Icon, 0] = 0;
+                    }
+                    Attributes[Net.GS.Message.GameAttribute.MinimapActive] = true;
+                }
+
                 Attributes.BroadcastChangedIfRevealed();
+
             }
         }
 
@@ -271,7 +306,48 @@ namespace NullD.Core.GS.Actors
                 UpdateConversationList();
                 return;
             }
+            if (Interactions.Count == 0 & Conversations.Count > 0)
+            {
+                int AllDialogs = 0;
+                ConversationManager Manager = new ConversationManager(player, this.World.Game.Quests);
+                foreach (var ConvSNO in Conversations)
+                {
+                    if (new Conversation(ConvSNO.ConversationSNO, player, Manager).asset.ConversationType == NullD.Common.MPQ.FileFormats.ConversationTypes.AmbientGossip)
+                    {
+                        AllDialogs++;
+                    }
+                }
+                Manager = null;
+                bool HaveUnReaded = false;
+                if (AllDialogs == Conversations.Count)
+                {
 
+                    if (Conversations.Count > 0 & Attributes[GameAttribute.Conversation_Icon, 0] != 1 & !(this is Vendor) & !(this is Healer))
+                    {
+                        foreach (var conv in this.Conversations)
+                        {
+                            if (!conv.Read)
+                            {
+                                Attributes[GameAttribute.Conversation_Icon, 0] = 3;
+                                HaveUnReaded = true;
+                                player.Conversations.StartConversation(conv.ConversationSNO);
+                                conv.Read = true;
+                            }
+                        }
+                        if (!HaveUnReaded)
+                        {
+                            Attributes[GameAttribute.Conversation_Icon, 0] = 0;
+                        }
+                        Attributes[Net.GS.Message.GameAttribute.MinimapActive] = true;
+                    }
+
+                    //player.Conversations.StartConversation(Conversations[DiIiS.Common.Helpers.Math.RandomHelper.Next(0,Conversations.Count-1)].ConversationSNO);
+
+                    //Conversations[0].MarkAsRead();
+                    UpdateConversationList();
+                    return;
+                }
+            }
 
             NPCInteraction[] npcInters = new NPCInteraction[count];
 
@@ -307,8 +383,9 @@ namespace NullD.Core.GS.Actors
                 ActorId = this.DynamicID,
                 Effect = Net.GS.Message.Definitions.Effect.Effect.Unknown36
             });
-
-            UpdateConversationList();
+            if (this.ActorSNO.Id != 203030 || //Лея в подвале
+              this.ActorSNO.Id != -1)
+                UpdateConversationList();
         }
 
         public void Consume(GameClient client, GameMessage message)
@@ -344,7 +421,9 @@ namespace NullD.Core.GS.Actors
             player.Conversations.StartConversation(conversation.ConversationSNO);
             conversation.MarkAsRead();
 
-            UpdateConversationList(); // erekose now the dialogs shit are updated properly :D yay !
+            if (this.ActorSNO.Id != 203030 || //Лея в подвале
+                    this.ActorSNO.Id != -1)
+                UpdateConversationList(); // erekose now the dialogs shit are updated properly :D yay !
 
         }
     }

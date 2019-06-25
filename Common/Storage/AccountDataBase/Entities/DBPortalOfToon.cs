@@ -15,6 +15,7 @@ namespace NullD.Common.Storage.AccountDataBase.Entities
         public virtual float X { get; set; }
         public virtual float Y { get; set; }
         public virtual float Z{ get; set; }
+        public virtual float PlayerIndex { get; set; }
         public virtual int WorldDest { get; set; }
     }
 }

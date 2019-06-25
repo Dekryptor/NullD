@@ -827,7 +827,6 @@ namespace NullD.Core.GS.Players
 
         private void BossPortal(GameClient Client, BossEncounterAccept msg)
         {
-
             switch (CurrentBossPortal)
             {
                 #region 1 Акт

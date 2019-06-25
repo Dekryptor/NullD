@@ -76,7 +76,7 @@ namespace NullD.Core.GS.Players
         public int ConvPiggyBack { get { return asset.SNOConvPiggyback; } }
         public int SNOId { get { return asset.Header.SNOId; } }
 
-        private NullD.Common.MPQ.FileFormats.Conversation asset;
+        public NullD.Common.MPQ.FileFormats.Conversation asset;
         private int LineIndex = 0;              // index within the RootTreeNodes, conversation progress
         private Player player;
         private ConversationManager manager;
@@ -128,8 +128,8 @@ namespace NullD.Core.GS.Players
                 logger.Warn(String.Format("More than one actor: {0}", sno));
             if (actors.Count() == 0)
             {
-                logger.Warn("Actor not found, using player actor instead");
-                return player;
+                logger.Warn("јктор дл€ диалога не найден, пытаемс€ исправить дыру!");
+                return player.World.SpawnMonsterWithGet(sno, new Vector3D(player.Position.X, player.Position.Y, player.Position.Z + 150));
             }
             return actors.First() as NullD.Core.GS.Actors.Actor;
         }
@@ -236,16 +236,35 @@ namespace NullD.Core.GS.Players
         /// </summary>
         private void EndConversation()
         {
-            player.InGameClient.SendMessage(new EndConversationMessage()
+            if (player.InGameClient.Game.Players.Count > 1)
             {
-                SNOConversation = asset.Header.SNOId,
-                ActorId = player.DynamicID
-            });
+                foreach (var Client in player.InGameClient.Game.Players.Values)
+                {
+                    Client.InGameClient.SendMessage(new EndConversationMessage()
+                    {
+                        SNOConversation = asset.Header.SNOId,
+                        ActorId = player.DynamicID
+                    });
 
-            player.InGameClient.SendMessage(new FinishConversationMessage
+                    Client.InGameClient.SendMessage(new FinishConversationMessage
+                    {
+                        SNOConversation = asset.Header.SNOId
+                    });
+                }
+            }
+            else
             {
-                SNOConversation = asset.Header.SNOId
-            });
+                player.InGameClient.SendMessage(new EndConversationMessage()
+                {
+                    SNOConversation = asset.Header.SNOId,
+                    ActorId = player.DynamicID
+                });
+
+                player.InGameClient.SendMessage(new FinishConversationMessage
+                {
+                    SNOConversation = asset.Header.SNOId
+                });
+            }
 
             //TODO: Handle each conversation type
             if (this.asset.ConversationType == ConversationTypes.QuestEvent || this.asset.ConversationType == ConversationTypes.QuestFloat)
@@ -294,11 +313,25 @@ namespace NullD.Core.GS.Players
         /// <param name="interrupted">sets whether the speaker is interrupted or not</param>
         private void StopLine(bool interrupted)
         {
-            player.InGameClient.SendMessage(new StopConvLineMessage()
+            if (player.InGameClient.Game.Players.Count > 1)
             {
-                PlayLineParamsId = currentUniqueLineID,
-                Interrupt = interrupted,
-            });
+                foreach (var Client in player.InGameClient.Game.Players.Values)
+                {
+                    Client.InGameClient.SendMessage(new StopConvLineMessage()
+                    {
+                        PlayLineParamsId = currentUniqueLineID,
+                        Interrupt = interrupted,
+                    });
+                }
+            }
+            else
+            {
+                player.InGameClient.SendMessage(new StopConvLineMessage()
+                {
+                    PlayLineParamsId = currentUniqueLineID,
+                    Interrupt = interrupted,
+                });
+            }
         }
 
         /// <summary>
@@ -324,37 +357,78 @@ namespace NullD.Core.GS.Players
             endTick = startTick + duration;
 
             // TODO Actor id should be CurrentSpeaker.DynamicID not PrimaryNPC.ActorID. This is a workaround because no audio for the player is playing otherwise
-            player.InGameClient.SendMessage(new PlayConvLineMessage()
+            if (player.InGameClient.Game.Players.Count > 1)
             {
-                ActorID = GetSpeaker(currentLineNode.Speaker1).DynamicID, // GetActorBySNO(asset.SNOPrimaryNpc).DynamicID,
-                Field1 = new uint[9]
+                foreach (var Client in player.InGameClient.Game.Players.Values)
+                {
+                    Client.InGameClient.SendMessage(new PlayConvLineMessage()
+                    {
+                        ActorID = GetSpeaker(currentLineNode.Speaker1).DynamicID, // GetActorBySNO(asset.SNOPrimaryNpc).DynamicID,
+                        Field1 = new uint[9]
                         {
                             player.DynamicID, asset.SNOPrimaryNpc != -1 ? GetActorBySNO(asset.SNOPrimaryNpc).DynamicID : 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
                         },
 
-                PlayLineParams = new PlayLineParams()
+                        PlayLineParams = new PlayLineParams()
+                        {
+                            SNOConversation = asset.Header.SNOId,
+                            Field1 = 0x00000000,
+                            Field2 = false,
+                            Field3 = true,
+                            Field4 = false,
+                            LineID = currentLineNode.LineID,
+                            Speaker = currentLineNode.Speaker1,
+                            Field5 = -1,
+                            AudioClass = (Class)Client.Toon.VoiceClassID,
+                            Gender = (Client.Toon.Gender == 0) ? VoiceGender.Male : VoiceGender.Female,
+                            TextClass = currentLineNode.Speaker1 == Speaker.Player ? (Class)Client.Toon.VoiceClassID : Class.None,
+                            SNOSpeakerActor = GetSpeaker(currentLineNode.Speaker1).ActorSNO.Id,
+                            Name = Client.Toon.HeroNameField.Value,
+                            Field11 = 0x00000000,  // is this field I1? and if...what does it do?? 2 for level up -farmy
+                            AnimationTag = currentLineNode.AnimationTag,
+                            Duration = duration,
+                            Id = currentUniqueLineID,
+                            Field15 = 0x00000000        // dont know, 0x32 for level up
+                        },
+                        Duration = duration,
+                    }, true);
+                }
+            }
+            else
+            {
+                // TODO Actor id should be CurrentSpeaker.DynamicID not PrimaryNPC.ActorID. This is a workaround because no audio for the player is playing otherwise
+                player.InGameClient.SendMessage(new PlayConvLineMessage()
                 {
-                    SNOConversation = asset.Header.SNOId,
-                    Field1 = 0x00000000,
-                    Field2 = false,
-                    Field3 = true,
-                    Field4 = false,
-                    LineID = currentLineNode.LineID,
-                    Speaker = currentLineNode.Speaker1,
-                    Field5 = -1,
-                    AudioClass = (Class)player.Toon.VoiceClassID,
-                    Gender = (player.Toon.Gender == 0) ? VoiceGender.Male : VoiceGender.Female,
-                    TextClass = currentLineNode.Speaker1 == Speaker.Player ? (Class)player.Toon.VoiceClassID : Class.None,
-                    SNOSpeakerActor = GetSpeaker(currentLineNode.Speaker1).ActorSNO.Id,
-                    Name = player.Toon.HeroNameField.Value,
-                    Field11 = 0x00000000,  // is this field I1? and if...what does it do?? 2 for level up -farmy
-                    AnimationTag = currentLineNode.AnimationTag,
+                    ActorID = GetSpeaker(currentLineNode.Speaker1).DynamicID, // GetActorBySNO(asset.SNOPrimaryNpc).DynamicID,
+                    Field1 = new uint[9]
+                            {
+                            player.DynamicID, asset.SNOPrimaryNpc != -1 ? GetActorBySNO(asset.SNOPrimaryNpc).DynamicID : 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
+                            },
+
+                    PlayLineParams = new PlayLineParams()
+                    {
+                        SNOConversation = asset.Header.SNOId,
+                        Field1 = 0x00000000,
+                        Field2 = false,
+                        Field3 = true,
+                        Field4 = false,
+                        LineID = currentLineNode.LineID,
+                        Speaker = currentLineNode.Speaker1,
+                        Field5 = -1,
+                        AudioClass = (Class)player.Toon.VoiceClassID,
+                        Gender = (player.Toon.Gender == 0) ? VoiceGender.Male : VoiceGender.Female,
+                        TextClass = currentLineNode.Speaker1 == Speaker.Player ? (Class)player.Toon.VoiceClassID : Class.None,
+                        SNOSpeakerActor = GetSpeaker(currentLineNode.Speaker1).ActorSNO.Id,
+                        Name = player.Toon.HeroNameField.Value,
+                        Field11 = 0x00000000,  // is this field I1? and if...what does it do?? 2 for level up -farmy
+                        AnimationTag = currentLineNode.AnimationTag,
+                        Duration = duration,
+                        Id = currentUniqueLineID,
+                        Field15 = 0x00000000        // dont know, 0x32 for level up
+                    },
                     Duration = duration,
-                    Id = currentUniqueLineID,
-                    Field15 = 0x00000000        // dont know, 0x32 for level up
-                },
-                Duration = duration,
-            }, true);
+                }, true);
+            }
         }
     }
 

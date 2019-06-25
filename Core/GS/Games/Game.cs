@@ -40,6 +40,8 @@ using System.Collections.Generic;
 using NullD.Net.LogNet;
 using NullD.Common.Storage;
 using NullD.Common.Storage.AccountDataBase.Entities;
+using NullD.Core.GS.AI.Brains;
+using NullD.Core.GS.Actors;
 
 namespace NullD.Core.GS.Games
 {
@@ -384,7 +386,7 @@ namespace NullD.Core.GS.Games
                             try
                             {
                                 Hireling LeahFriend = new LeahParty(StartingWorld, LeahBrains.ActorSNO.Id, LeahBrains.Tags);
-                                //LeahFriend.Brain = new HirelingBrain(LeahFriend);
+                                LeahFriend.Brain = new HirelingBrain(LeahFriend);
 
                                 LeahFriend.GBHandle.Type = 4;
                                 LeahFriend.GBHandle.GBID = 717705071;
@@ -458,6 +460,64 @@ namespace NullD.Core.GS.Games
 
                     #endregion
 
+                    #region Акт 1 Квест 3 - Сломанная корона
+                    else if (joinedPlayer.Toon.ActiveQuest == 72221)
+                    {
+                        StartingWorld.Leave(StartingWorld.GetActorByDynamicId(72));
+
+                        #region Перемотка ко второму квесту
+                        for (int Rem = 0; Rem < 8; Rem++)
+                        {
+                            StartingWorld.Game.Quests.Advance(87700);
+                        }
+                        StartingWorld.Game.Quests.NotifyQuest(87700, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.InteractWithActor, 192164);
+                        StartingWorld.Game.Quests.NotifyQuest(87700, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.HadConversation, 198521);
+                        #endregion
+                        #region Перемотка ко третьему квесту
+                        for (int Rem = 0; Rem < 15; Rem++)
+                        {
+                            StartingWorld.Game.Quests.Advance(72095);
+                        }
+                        StartingWorld.Game.Quests.NotifyQuest(72095, NullD.Common.MPQ.FileFormats.QuestStepObjectiveType.HadConversation, 198617);
+
+                        var NewLeah = StartingWorld.GetActorByDynamicId(25);
+                        foreach (var Conv in (NewLeah as InteractiveNPC).Conversations)
+                        {
+                            if (Conv.ConversationSNO == 198617)
+                            {
+                                Conv.Read = true;
+                            }
+                        }
+                        #endregion
+                        if (joinedPlayer.Toon.StepIDofQuest == -1)
+                        {
+                            var BlacksmithQuest = StartingWorld.GetActorBySNO(65036);
+                            (BlacksmithQuest as Core.GS.Actors.InteractiveNPC).Conversations.Clear();
+                            (BlacksmithQuest as Core.GS.Actors.InteractiveNPC).Conversations.Add(new Core.GS.Actors.Interactions.ConversationInteraction(198292));
+                            (BlacksmithQuest as Core.GS.Actors.InteractiveNPC).Attributes[Net.GS.Message.GameAttribute.Conversation_Icon, 0] = 1;
+                            (BlacksmithQuest as Core.GS.Actors.InteractiveNPC).Attributes.BroadcastChangedIfRevealed();
+                        }
+                        else
+                        {
+                            joinedPlayer.Toon.StepOfQuest = 5;
+                        }
+                        //Удаляем ненужныю корону.
+                        foreach (var plr in StartingWorld.Game.Players.Values)
+                        {
+                            var inventory = plr.Inventory;
+                            foreach (var itm in inventory.GetBackPackItems())
+                            {
+                                if (itm.ActorSNO.Id == 92168 || itm.ActorSNO.Id == 5356)
+                                {
+                                    inventory.DestroyInventoryItem(itm);
+                                    inventory.RefreshInventoryToClient();
+                                }
+                            }
+                        }
+
+                    }
+                    #endregion
+
                 }
             }
             #region Прохождение игры 2.0 и Хард Фиксы
@@ -471,6 +531,7 @@ namespace NullD.Core.GS.Games
                     {
                         #region Нижнии ворота тристрама
                         var DownGate = StartingWorld.GetActorBySNO(90419);
+                        DownGate.Field2 = 16;
                         DownGate.Attributes[GameAttribute.Gizmo_State] = 1;
                         DownGate.Attributes[GameAttribute.Untargetable] = true;
                         DownGate.Attributes.BroadcastChangedIfRevealed();

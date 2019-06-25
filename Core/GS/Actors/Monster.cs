@@ -45,7 +45,68 @@ namespace NullD.Core.GS.Actors
         {
             get
             {
-                return (int)NullD.Common.MPQ.FileFormats.SpawnType.Normal;
+                if (ActorSNO.Id == 85900 || // Мира жена кузнеца
+                    ActorSNO.Id == 5350 || // Леорик
+                    ActorSNO.Id == 176889 || // Мать её..)
+                    ActorSNO.Id == 156801 || //Капитан Далтин
+                    ActorSNO.Id == 156353 || //Советник Имон
+                    ActorSNO.Id == 86624 || //Йондар
+                    ActorSNO.Id == 131131 || //Пророк Урик
+                    ActorSNO.Id == 139757 || //Пророк Эзек
+                    ActorSNO.Id == 139713 || //Брат в пещере 1
+                    ActorSNO.Id == 139715 || //Брат в пещере 2
+                    ActorSNO.Id == 139756 || //Брат в пещере 3
+                    ActorSNO.Id == 178619 || //Урцель Мордрег
+                    ActorSNO.Id == 51341 || //Королева Арана
+                    ActorSNO.Id == 98879 || //Главный тюремщик
+                    ActorSNO.Id == 3526 || //Мясник
+                    ActorSNO.Id == 174013 || //Разбойник - Нигель
+                    ActorSNO.Id == 6031 || //Магда
+                    ActorSNO.Id == 196102 || //Искату
+                    ActorSNO.Id == 4630 || //Диспаир
+                    ActorSNO.Id == 148449 || //Изуал
+                    ActorSNO.Id == 114917 || //ДЪЯБЛО!!!
+                    ActorSNO.Id == 133562 || //Тень Дъябло
+                    ActorSNO.Id == 0)
+                {
+
+                    return (int)NullD.Common.MPQ.FileFormats.SpawnType.Boss;
+                }
+                else if (//ActorSNO.Id == 6652 ||
+                         ActorSNO.Id == 0
+                        )
+                {
+                    return (int)NullD.Common.MPQ.FileFormats.SpawnType.Rare;
+                }
+                else if (ActorSNO.Id == 219995 ||  //Моррис Джекйобс
+                         ActorSNO.Id == 129439 ||  //Арсект ядовитый
+                         ActorSNO.Id == 115403 ||  //Головоруб
+                         ActorSNO.Id == 81533 || // Чупа-Хаза
+                         ActorSNO.Id == 0)
+                {
+                    return (int)NullD.Common.MPQ.FileFormats.SpawnType.Unique;
+                }
+                else if (ActorSNO.Id == 219725 ||  //Проклятая мать
+                         ActorSNO.Id == 90367 ||  //Темный пробудитель
+                         ActorSNO.Id == 178300 ||  //Берсерки в Вортеме 
+                         ActorSNO.Id == 375 ||  //Шаманы клана луны
+                         ActorSNO.Id == -2)
+                {
+                    return (int)NullD.Common.MPQ.FileFormats.SpawnType.Champion;
+                }
+                else if (ActorSNO.Id == 6644 || // Тонкий зомбарь
+                         ActorSNO.Id == 6652 ||// Толстый зомбарь
+                         ActorSNO.Id == 0)
+                {
+                    int Percent = RandomHelper.Next(0, 100);
+                    if (Percent > 98)
+                        return (int)NullD.Common.MPQ.FileFormats.SpawnType.Champion;
+                    else
+                        return (int)NullD.Common.MPQ.FileFormats.SpawnType.Normal;
+                }
+                else
+                    return (int)NullD.Common.MPQ.FileFormats.SpawnType.Normal;
+
             }
             set
             {
@@ -80,6 +141,11 @@ namespace NullD.Core.GS.Actors
             this.GBHandle.Type = (int)GBHandleType.Monster; this.GBHandle.GBID = 1;
             this.Attributes[GameAttribute.Experience_Granted] = 125 * Config.Instance.ExpRate;
 
+            if (this.Quality == (int)NullD.Common.MPQ.FileFormats.SpawnType.Boss)
+            {
+                //Включаем иконку босса.
+                this.Attributes[GameAttribute.MinimapActive] = true;
+            }
             // lookup GameBalance MonsterLevels.gam asset
             var monsterLevels = (GameBalance)NullD.Common.MPQ.MPQStorage.Data.Assets[SNOGroup.GameBalance][19760].Data;
             var monsterData = (Monster.Target as MonsterFF);

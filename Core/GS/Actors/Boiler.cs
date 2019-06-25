@@ -55,7 +55,7 @@ namespace NullD.Core.GS.Actors.Implementations
                 if (plr.PlayerIndex == 0 & plr.Toon.ActiveQuest == 72095)
                 {
                     plr.Toon.ActiveQuest = 72095;
-                    if (plr.Toon.StepOfQuest == 5)
+                    if (plr.Toon.StepOfQuest == 6)
                     {
                         plr.Toon.StepIDofQuest = 43;
                         StartConversation(World, 167115);

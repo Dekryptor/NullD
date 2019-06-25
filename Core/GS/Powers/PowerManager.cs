@@ -149,6 +149,27 @@ namespace NullD.Core.GS.Powers
                     }
 
                     #endregion
+
+                    #region Выход через шкаф)
+
+                    else if (target.ActorSNO.Id == 188743)
+                    {
+                        foreach (var player in user.World.Players)
+                        {
+                            if (player.Value.Toon.ActiveQuest == 72095)
+                            {
+                                player.Value.Toon.ActiveQuest = 72095;
+                                if (player.Value.Toon.StepOfQuest == 14)
+                                {
+                                    player.Value.Toon.StepOfQuest = 15;
+                                    player.Value.Toon.StepIDofQuest = 32;
+                                    user.World.Game.Quests.Advance(72095);
+                                }
+                            }
+                        }
+                    }
+
+                    #endregion
                 }
                 catch { }
             }

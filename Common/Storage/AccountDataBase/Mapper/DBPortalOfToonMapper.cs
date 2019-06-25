@@ -17,6 +17,7 @@ namespace NullD.Common.Storage.AccountDataBase.Mapper
             Map(e => e.X);
             Map(e => e.Y);
             Map(e => e.Z);
+            Map(e => e.PlayerIndex);
             Map(e => e.WorldDest);
 
         }

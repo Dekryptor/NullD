@@ -84,7 +84,53 @@ namespace NullD.Net.GS.Message
             return msg;
         }
 
-        protected GameMessage() { }
+        protected GameMessage()
+        {
+            #region 1.0.4
+            //*
+            if (this is Message.Definitions.Encounter.BossEncounterMessage)
+                (this as Definitions.Encounter.BossEncounterMessage).Id = 253;
+
+            if (this is Message.Definitions.Camera.BossZoomMessage)
+                (this as Definitions.Camera.BossZoomMessage).Id = 273;
+
+            if (this is Message.Definitions.Misc.PlayCutsceneMessage)
+                (this as Definitions.Misc.PlayCutsceneMessage).Id = 139;
+
+            if (this is Message.Definitions.Pet.PetMessage)
+                (this as Definitions.Pet.PetMessage).Id = 167;
+
+            if (this is Message.Definitions.Pet.PetDetachMessage)
+                (this as Definitions.Pet.PetDetachMessage).Id = 168;
+
+            if (this is Message.Definitions.Encounter.EncounterInviteStateMessage)
+                (this as Definitions.Encounter.EncounterInviteStateMessage).Id = 259;
+
+            if (this is Message.Definitions.Act.ActTransitionMessage)
+                (this as Definitions.Act.ActTransitionMessage).Id = 180;
+
+            if (this is Message.Definitions.Misc.SaviorMessage)
+                (this as Definitions.Misc.SaviorMessage).Id = 221;
+            if (this is Message.Definitions.Combat.DeathFadeTimeMessage)
+                (this as Definitions.Combat.DeathFadeTimeMessage).Id = 209;//
+
+            if (this is Message.Definitions.Act.ActTransitionStartedMessage)
+                (this as Definitions.Act.ActTransitionStartedMessage).Id = 235;
+
+            if (this is Message.Definitions.Misc.TimedEventStartedMessage)
+                (this as Definitions.Misc.TimedEventStartedMessage).Id = 233;
+
+
+
+            if (this is Message.Definitions.Combat.KillCountMessage)
+                (this as Definitions.Combat.KillCountMessage).Id = 191;
+            if (this is Message.Definitions.Combat.KillCounterUpdateMessage)
+                (this as Definitions.Combat.KillCounterUpdateMessage).Id = 219;
+            if (this is Message.Definitions.UI.UIElementMessage)
+                (this as Definitions.UI.UIElementMessage).Id = 170;
+            //*/
+            #endregion
+        }
 
         protected GameMessage(int id)
         {
